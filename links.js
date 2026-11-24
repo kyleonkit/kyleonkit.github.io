@@ -34,10 +34,11 @@ window.SITE = {
     {
       group: "Lame Genie",
       links: [
-        { icon: "youtube",   label: "YouTube",   url: "https://www.youtube.com/@lamegenie" },
-        { icon: "spotify",   label: "Spotify",   url: "https://open.spotify.com/artist/0LTTK6hdRk3ksLfnuppOHm" },
-        { icon: "instagram", label: "Instagram", url: "https://www.instagram.com/lamegenie" },
-        { icon: "tiktok",    label: "TikTok",    url: "https://www.tiktok.com/@lamegenie" },
+        // stat/statLabel → shown as a tile. Last updated 2026-11-24.
+        { icon: "youtube",   label: "YouTube",   stat: "75.7K", statLabel: "Subscribers",       url: "https://www.youtube.com/@lamegenie" },
+        { icon: "spotify",   label: "Spotify",   stat: "67.1K", statLabel: "Monthly listeners", url: "https://open.spotify.com/artist/0LTTK6hdRk3ksLfnuppOHm" },
+        { icon: "tiktok",    label: "TikTok",    stat: "27.8K", statLabel: "Followers",         url: "https://www.tiktok.com/@lamegenie" },
+        { icon: "instagram", label: "Instagram", stat: "7.7K",  statLabel: "Followers",         url: "https://www.instagram.com/lamegenie" },
         { icon: "globe",     label: "Website",   url: "https://lamegenie.com" },
       ],
     },

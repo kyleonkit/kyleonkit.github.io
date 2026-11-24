@@ -101,9 +101,36 @@
         sub.textContent = l.subtitle;
         li.appendChild(sub);
       }
+      // Links with a stat → tiles (big number + label)
+      const withStats = (l.links || []).filter((g) => g.stat);
+      if (withStats.length) {
+        const grid = document.createElement("div");
+        grid.className = "stats";
+        withStats.forEach((g) => {
+          const a = anchor(g.url);
+          a.className += " stat";
+          a.setAttribute("aria-label", `${g.label}: ${g.stat} ${g.statLabel || ""}`.trim());
+          const top = document.createElement("span");
+          top.className = "stat-top";
+          top.appendChild(iconEl(g.icon));
+          const lab = document.createElement("span");
+          lab.textContent = g.label;
+          top.appendChild(lab);
+          const num = document.createElement("span");
+          num.className = "stat-num";
+          num.textContent = g.stat;
+          const what = document.createElement("span");
+          what.className = "stat-label";
+          what.textContent = g.statLabel || "";
+          a.append(top, num, what);
+          grid.appendChild(a);
+        });
+        li.appendChild(grid);
+      }
+
       const row = document.createElement("div");
       row.className = "chips";
-      (l.links || []).forEach((g) => {
+      (l.links || []).filter((g) => !g.stat).forEach((g) => {
         const a = anchor(g.url);
         a.className += " chip";
         a.appendChild(iconEl(g.icon));
@@ -112,7 +139,7 @@
         a.appendChild(lab);
         row.appendChild(a);
       });
-      li.appendChild(row);
+      if (row.children.length) li.appendChild(row);
       list.appendChild(li);
       return;
     }
