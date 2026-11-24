@@ -15,7 +15,7 @@
 // ─────────────────────────────────────────────────────────────
 window.SITE = {
   name: "Kyle on Kit",
-  tagline: "Drummer · Gig vlogs · Covers",
+  tagline: "Drummer | Audio/Video Engineer | Gig Vlogs",
 
   // Small round icons under the logo (Kyle's own profiles)
   socials: [
