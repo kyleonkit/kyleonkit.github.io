@@ -1,12 +1,12 @@
 """Generate every Kyle on Kit brand asset from assets/source-logo.png.
 
-Layout: KYLE (white) on line 1; line 2 = "ON" in white at full cap height,
-then "KIT" in black inside the yellow block.
+Logo: the original artwork (yellow block on "ON"), with a transparent background.
+Icons (favicon, Android launcher, QR centre): the word "KIT" alone, no box.
 
     python tools/make_brand.py [path/to/kyle-on-kit-qr-widget]
 
 Writes:
-  assets/logo.png, assets/badge.png, assets/favicon.png, assets/og-image.png
+  assets/logo.png, assets/kit.png, assets/favicon.png, assets/og-image.png
   qr/kyleonkit-qr.png, qr/kyleonkit-qr-phone.png
   (+ Android res drawables/icon if a widget project path is given)
 """
@@ -42,7 +42,9 @@ def alpha_glyphs(img, box, invert=False):
     out = Image.new("RGBA", crop.size, (255, 255, 255, 0))
     out.putalpha(crop)
     bbox = crop.point(lambda v: 255 if v > 24 else 0).getbbox()
-    return out.crop(bbox)
+    glyphs = out.crop(bbox)
+    glyphs.info["origin"] = (box[0] + bbox[0], box[1] + bbox[1])  # position in the source
+    return glyphs
 
 
 def tint(glyphs, rgb):
@@ -64,25 +66,26 @@ def rounded_block(w, h, r, ss=4):
     return b
 
 
+ON_BLOCK = (360, 390, 613, 508)     # original yellow block around "ON"
+
+
 def build_logo():
+    """Original logo on a transparent background; returns (full, logo crop, white KIT glyphs)."""
     src = Image.open(SRC).convert("RGB")
+    canvas = Image.new("RGBA", src.size, (0, 0, 0, 0))
+    # White words: KYLE and KIT
     kyle = alpha_glyphs(src, KYLE_BOX)
-    on = scale_h(alpha_glyphs(src, ON_BOX, invert=True), LINE2_H)
-    kit = scale_h(alpha_glyphs(src, KIT_BOX), INNER_H)
+    canvas.alpha_composite(kyle, kyle.info["origin"])
+    kit = alpha_glyphs(src, KIT_BOX)
+    canvas.alpha_composite(kit, kit.info["origin"])
+    # Yellow block with black "ON", copied as-is under a clean rounded mask
+    x0, y0, x1, y1 = ON_BLOCK
+    block = src.crop(ON_BLOCK).convert("RGBA")
+    block.putalpha(rounded_block(x1 - x0, y1 - y0, RADIUS).split()[3])
+    canvas.alpha_composite(block, (x0, y0))
 
-    canvas = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
-    canvas.alpha_composite(kyle, (LEFT, 215))
-    canvas.alpha_composite(on, (LEFT, LINE2_TOP))
-
-    bx = LEFT + on.width + GAP
-    bw = RIGHT + 1 - bx
-    block = rounded_block(bw, BLOCK_H, RADIUS)
-    block.alpha_composite(tint(kit, (0, 0, 0)), ((bw - kit.width) // 2, (BLOCK_H - kit.height) // 2))
-    canvas.alpha_composite(block, (bx, BLOCK_TOP))
-
-    badge = block.copy()
     logo = canvas.crop((350, 205, 907, 519))
-    return canvas, logo, badge
+    return canvas, logo, kit
 
 
 def qr_image(badge, size, quiet=4):
@@ -100,8 +103,9 @@ def qr_image(badge, size, quiet=4):
             if v:
                 d.rectangle([(x + quiet) * px, (y + quiet) * px,
                              (x + quiet + 1) * px - 1, (y + quiet + 1) * px - 1], fill=(0, 0, 0))
-    bw = int(size * 0.26)
-    b = badge.resize((bw, round(bw * badge.height / badge.width)), Image.LANCZOS)
+    bw = int(size * 0.24)
+    b = tint(badge, (0, 0, 0))
+    b = b.resize((bw, round(bw * b.height / b.width)), Image.LANCZOS)
     pad = int(px * 1.2)
     x0, y0 = (size - b.width) // 2, (size - b.height) // 2
     d.rounded_rectangle([x0 - pad, y0 - pad, x0 + b.width + pad, y0 + b.height + pad], radius=pad, fill=(255, 255, 255))
@@ -145,10 +149,12 @@ def phone_card(logo, badge):
     return card
 
 
-def square_icon(badge, size, fill=0.78):
+def square_icon(kit, size, fill=0.72):
+    """White KIT on black, sized to stay inside round launcher masks."""
     sq = Image.new("RGB", (size, size), (0, 0, 0))
     bw = int(size * fill)
-    b = badge.resize((bw, round(bw * badge.height / badge.width)), Image.LANCZOS)
+    b = tint(kit, (255, 255, 255))
+    b = b.resize((bw, round(bw * b.height / b.width)), Image.LANCZOS)
     sq.paste(b, ((size - b.width) // 2, (size - b.height) // 2), b)
     return sq
 
@@ -159,7 +165,9 @@ def main():
     os.makedirs(a("qr"), exist_ok=True)
 
     logo.save(a("assets", "logo.png"), optimize=True)
-    badge.save(a("assets", "badge.png"))
+    badge.save(a("assets", "kit.png"))
+    if os.path.exists(a("assets", "badge.png")):
+        os.remove(a("assets", "badge.png"))
     square_icon(badge, 256).save(a("assets", "favicon.png"))
     og = Image.new("RGB", full.size, (0, 0, 0))
     og.paste(full, (0, 0), full)
