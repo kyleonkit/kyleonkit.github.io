@@ -9,6 +9,7 @@
     calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
     cart: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h12L22 7H6"/>',
     music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
   };
 
   function iconEl(name) {
@@ -63,6 +64,46 @@
   (S.links || []).forEach((l, i) => {
     const li = document.createElement("li");
     li.style.animationDelay = `${80 + i * 60}ms`;
+
+    // Section heading
+    if (l.heading) {
+      li.className = "heading";
+      const h = document.createElement("h2");
+      h.textContent = l.heading;
+      li.appendChild(h);
+      list.appendChild(li);
+      return;
+    }
+
+    // Group (e.g. a band): name + row of labelled icon links
+    if (l.group) {
+      li.className = "group";
+      const name = document.createElement("div");
+      name.className = "group-name";
+      name.textContent = l.group;
+      li.appendChild(name);
+      if (l.subtitle) {
+        const sub = document.createElement("div");
+        sub.className = "group-sub";
+        sub.textContent = l.subtitle;
+        li.appendChild(sub);
+      }
+      const row = document.createElement("div");
+      row.className = "chips";
+      (l.links || []).forEach((g) => {
+        const a = anchor(g.url);
+        a.className += " chip";
+        a.appendChild(iconEl(g.icon));
+        const lab = document.createElement("span");
+        lab.textContent = g.label;
+        a.appendChild(lab);
+        row.appendChild(a);
+      });
+      li.appendChild(row);
+      list.appendChild(li);
+      return;
+    }
+
     const a = anchor(l.url);
     a.className += " card" + (l.featured ? " featured" : "");
     a.appendChild(iconEl(l.icon));
