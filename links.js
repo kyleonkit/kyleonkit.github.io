@@ -33,6 +33,7 @@ window.SITE = {
 
     {
       group: "Lame Genie",
+      subtitle: "Video game music covers",
       links: [
         // stat/statLabel → shown as a tile. Last updated 2026-11-24.
         { icon: "youtube",   label: "YouTube",   stat: "75.7K", statLabel: "Subscribers",       url: "https://www.youtube.com/@lamegenie" },
@@ -44,6 +45,7 @@ window.SITE = {
     },
     {
       group: "Run For Covers",
+      subtitle: "Your favorite cover band's favorite cover band",
       links: [
         { icon: "instagram", label: "Instagram", url: "https://www.instagram.com/run4covers" },
         { icon: "linktree",  label: "All Links", url: "https://linktr.ee/Runforcovers" },
