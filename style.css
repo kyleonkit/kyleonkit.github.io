@@ -288,6 +288,8 @@ body {
 .stat:not(.soon):hover { border-color: var(--yellow); transform: translateY(-1px); }
 .stat:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
 .stats + .chips { margin-top: 10px; }
+/* Odd number of tiles: last one spans the full row */
+.stat:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
 /* Placeholder (no URL yet) */
 .soon { cursor: default; opacity: 0.45; }
