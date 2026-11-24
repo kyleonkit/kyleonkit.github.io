@@ -69,8 +69,44 @@ def rounded_block(w, h, r, ss=4):
 ON_BLOCK = (360, 390, 613, 508)     # original yellow block around "ON"
 
 
+# 2026-11 logo: copy of P:/My Drive/Logos/kyleonkit-white.png (transparent PNG)
+NEW_LOGO = os.path.join(ROOT, "assets", "source-logo-2026.png")
+
+
 def build_logo():
-    """Original logo on a transparent background; returns (full, logo crop, white KIT glyphs)."""
+    """Returns (full canvas, logo crop, white KIT glyphs). Uses the new logo if present."""
+    if os.path.exists(NEW_LOGO):
+        return build_logo_new()
+    return build_logo_old()
+
+
+def build_logo_new():
+    full = Image.open(NEW_LOGO).convert("RGBA")
+    x0, y0, x1, y1 = full.getbbox()
+    logo = full.crop((x0 - 8, y0 - 8, x1 + 8, y1 + 8))
+    # KIT = white pixels on the bottom line, right of the yellow block
+    px = logo.load()
+    w, h = logo.size
+    yellow_cols = [x for x in range(w) for y in (h * 3 // 4,)
+                   if px[x, y][3] > 128 and px[x, y][2] < 80 and px[x, y][0] > 200]
+    kx = max(yellow_cols) + 6
+    # Top of line 2 = first row where the yellow block starts
+    ytop = min(y for y in range(h) for x in (yellow_cols[len(yellow_cols) // 2],)
+               if px[x, y][3] > 128 and px[x, y][2] < 80 and px[x, y][0] > 200)
+    region = logo.crop((kx, ytop - 4, w, h))
+    mask = Image.new("L", region.size, 0)
+    rp, mp = region.load(), mask.load()
+    for y in range(region.height):
+        for x in range(region.width):
+            r, g, b, a = rp[x, y]
+            mp[x, y] = a if (r > 128 and b > 128) else 0
+    kit = Image.new("RGBA", region.size, (255, 255, 255, 0))
+    kit.putalpha(mask)
+    kit = kit.crop(mask.point(lambda v: 255 if v > 24 else 0).getbbox())
+    return full, logo, kit
+
+
+def build_logo_old():
     src = Image.open(SRC).convert("RGB")
     canvas = Image.new("RGBA", src.size, (0, 0, 0, 0))
     # White words: KYLE and KIT
