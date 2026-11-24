@@ -7,7 +7,7 @@ set -e
 cd "$(dirname "$0")"
 MSG="${1:-Update links}"
 V=$(date +%Y%m%d%H%M%S)
-sed -i -E "s#(style.css|links.js|app.js|assets/[a-z-]+.png)\?v=[0-9]+#\1?v=$V#g" index.html
+sed -i -E "s#(style.css|links.js|app.js|assets/[a-z-]+.png)\?v=[0-9]+#\1?v=$V#g" index.html links.js
 
 export GH_TOKEN=$(gh auth token --user kyleonkit)
 git add -A

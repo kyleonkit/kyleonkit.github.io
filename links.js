@@ -10,7 +10,7 @@
 //  links[] entries can be:
 //    { title, subtitle, icon, url, featured }  → big button
 //    { heading: "Bands" }                      → section divider
-//    { group: "Band", subtitle, links: [{ icon, label, url }] }
+//    { group: "Band", logo, subtitle, links: [{ icon, label, url }] }
 //                                              → card with a row of chips
 // ─────────────────────────────────────────────────────────────
 window.SITE = {
@@ -33,6 +33,7 @@ window.SITE = {
 
     {
       group: "Lame Genie",
+      logo: "assets/band-lame-genie.png?v=20261124140425",
       subtitle: "Video game music covers",
       links: [
         // stat/statLabel → shown as a tile. Last updated 2026-11-24.
@@ -46,6 +47,8 @@ window.SITE = {
     },
     {
       group: "Run For Covers",
+      logo: "assets/band-run-for-covers.png?v=20261124140425",
+      logoStyle: "boxed",
       subtitle: "Your favorite cover band's favorite cover band",
       links: [
         { icon: "instagram", label: "Instagram", url: "https://www.instagram.com/run4covers" },

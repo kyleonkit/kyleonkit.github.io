@@ -91,16 +91,30 @@
     // Group (e.g. a band): name + row of labelled icon links
     if (l.group) {
       li.className = "group";
+      // Header: optional band logo + name/subtitle
+      const head = document.createElement("div");
+      head.className = "group-head";
+      if (l.logo) {
+        const img = document.createElement("img");
+        img.className = "group-logo" + (l.logoStyle ? " " + l.logoStyle : "");
+        img.src = l.logo;
+        img.alt = "";
+        img.width = img.height = 64;
+        head.appendChild(img);
+      }
+      const titles = document.createElement("div");
       const name = document.createElement("div");
       name.className = "group-name";
       name.textContent = l.group;
-      li.appendChild(name);
+      titles.appendChild(name);
       if (l.subtitle) {
         const sub = document.createElement("div");
         sub.className = "group-sub";
         sub.textContent = l.subtitle;
-        li.appendChild(sub);
+        titles.appendChild(sub);
       }
+      head.appendChild(titles);
+      li.appendChild(head);
       // Links with a stat → tiles (big number + label)
       const withStats = (l.links || []).filter((g) => g.stat);
       if (withStats.length) {

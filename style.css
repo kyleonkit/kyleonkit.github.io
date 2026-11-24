@@ -205,6 +205,22 @@ body {
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
 }
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.group-logo {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+/* Square artwork with its own background: rounded tile */
+.group-logo.boxed {
+  border-radius: 12px;
+  border: 1px solid var(--tile-line);
+}
 .group-name {
   font-weight: 900;
   font-size: 18px;
