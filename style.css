@@ -269,6 +269,13 @@ body {
   font-weight: 500;
 }
 
+.tagline .seg { white-space: nowrap; }
+.tagline .sep { color: var(--yellow); margin: 0 0.15em; }
+
+@media (max-width: 480px) {
+  .tagline { font-size: 11px; letter-spacing: 0.08em; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .links li { animation: none; opacity: 1; }
   .card, .social, .arrow { transition: none; }

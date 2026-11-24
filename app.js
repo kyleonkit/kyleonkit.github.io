@@ -47,7 +47,20 @@
   }
 
   if (S.name) document.title = S.name;
-  document.getElementById("tagline").textContent = S.tagline || "";
+  // Tagline: "a | b | c" → segments that only wrap at the dividers
+  const tag = document.getElementById("tagline");
+  (S.tagline || "").split("|").map((s) => s.trim()).filter(Boolean).forEach((seg, i) => {
+    if (i) {
+      const d = document.createElement("span");
+      d.className = "sep";
+      d.textContent = "|";
+      tag.append(" ", d, " ");
+    }
+    const s = document.createElement("span");
+    s.className = "seg";
+    s.textContent = seg;
+    tag.appendChild(s);
+  });
   document.getElementById("footer").textContent = S.footer || "";
 
   const socials = document.getElementById("socials");
