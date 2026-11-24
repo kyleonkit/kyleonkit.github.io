@@ -216,6 +216,12 @@ body {
   height: 64px;
   object-fit: contain;
 }
+/* Wide wordmark: keep its shape, limit the width */
+.group-logo.wide {
+  width: auto;
+  max-width: 110px;
+  height: 64px;
+}
 /* Square artwork with its own background: rounded tile */
 .group-logo.boxed {
   border-radius: 12px;

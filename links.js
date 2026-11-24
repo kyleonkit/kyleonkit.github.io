@@ -33,7 +33,8 @@ window.SITE = {
 
     {
       group: "Lame Genie",
-      logo: "assets/band-lame-genie.png?v=20261124140425",
+      logo: "assets/band-lame-genie.png?v=20261124140814",
+      logoStyle: "wide",
       subtitle: "Video game music covers",
       links: [
         // stat/statLabel → shown as a tile. Last updated 2026-11-24.
@@ -47,7 +48,7 @@ window.SITE = {
     },
     {
       group: "Run For Covers",
-      logo: "assets/band-run-for-covers.png?v=20261124140425",
+      logo: "assets/band-run-for-covers.png?v=20261124140814",
       logoStyle: "boxed",
       subtitle: "Your favorite cover band's favorite cover band",
       links: [
