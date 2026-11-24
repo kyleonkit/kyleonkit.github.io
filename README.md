@@ -1,6 +1,6 @@
 # Kyle on Kit — Links
 
-Linktree-style link page, hosted on GitHub Pages: https://vgmdrums.github.io/kyleonkit/
+Linktree-style link page, hosted on GitHub Pages: https://kyleonkit.github.io/
 
 Plain static site, no build step.
 
