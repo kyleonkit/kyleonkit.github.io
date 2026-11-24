@@ -19,14 +19,14 @@ window.SITE = {
 
   // Small round icons under the logo (Kyle's own profiles)
   socials: [
-    { icon: "youtube",   label: "YouTube",   url: "https://www.youtube.com/@kyleonkitdrums" },
     { icon: "instagram", label: "Instagram", url: "https://www.instagram.com/kyleonkit" },
+    { icon: "youtube",   label: "YouTube",   url: "https://www.youtube.com/@kyleonkitdrums" },
     { icon: "tiktok",    label: "TikTok",    url: "https://www.tiktok.com/@kyleonkit" },
   ],
 
   links: [
-    { icon: "youtube",   title: "YouTube",   subtitle: "Gig vlogs & drum covers", url: "https://www.youtube.com/@kyleonkitdrums", featured: true },
-    { icon: "instagram", title: "Instagram", subtitle: "@kyleonkit", url: "https://www.instagram.com/kyleonkit" },
+    { icon: "instagram", title: "Instagram", subtitle: "@kyleonkit", url: "https://www.instagram.com/kyleonkit", featured: true },
+    { icon: "youtube",   title: "YouTube",   subtitle: "Gig vlogs & drum covers", url: "https://www.youtube.com/@kyleonkitdrums" },
     { icon: "tiktok",    title: "TikTok",    subtitle: "@kyleonkit", url: "https://www.tiktok.com/@kyleonkit" },
 
     { heading: "Bands" },
