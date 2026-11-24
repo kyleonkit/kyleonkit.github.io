@@ -175,6 +175,7 @@ def main():
 
     qr_square = qr_image(badge, 1200)
     qr_square.save(a("qr", "kyleonkit-qr.png"))
+    qr_square.resize((480, 480), Image.LANCZOS).save(a("assets", "qr.png"), optimize=True)  # site footer
     phone_card(logo, badge).save(a("qr", "kyleonkit-qr-phone.png"))
     print("site assets + QR written")
 

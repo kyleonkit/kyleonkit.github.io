@@ -314,9 +314,34 @@ body {
   mask: no-repeat center / contain;
 }
 
-.foot {
+/* QR code */
+.qr {
   margin-top: auto;
   padding-top: 40px;
+  text-align: center;
+}
+.qr a {
+  display: inline-block;
+  padding: 10px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.qr a:hover { transform: translateY(-2px); box-shadow: 0 0 0 3px var(--yellow), var(--shadow); }
+.qr a:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+.qr img { display: block; width: 180px; height: 180px; border-radius: 8px; }
+.qr-label {
+  margin: 12px 0 0;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.foot {
+  padding-top: 28px;
   text-align: center;
   font-size: 12px;
   color: #8a8a8a;
