@@ -142,9 +142,14 @@ def qr_image(badge, size, quiet=4):
     bw = int(size * 0.24)
     b = tint(badge, (0, 0, 0))
     b = b.resize((bw, round(bw * b.height / b.width)), Image.LANCZOS)
-    pad = int(px * 1.2)
+    pad = int(px * 1.6)
+    border = max(2, int(px * 0.45))           # black border around the KIT pad
+    gap = int(px * 0.8)                       # white space outside the border
     x0, y0 = (size - b.width) // 2, (size - b.height) // 2
-    d.rounded_rectangle([x0 - pad, y0 - pad, x0 + b.width + pad, y0 + b.height + pad], radius=pad, fill=(255, 255, 255))
+    box = [x0 - pad, y0 - pad, x0 + b.width + pad, y0 + b.height + pad]
+    d.rounded_rectangle([box[0] - gap, box[1] - gap, box[2] + gap, box[3] + gap],
+                        radius=pad + gap, fill=(255, 255, 255))
+    d.rounded_rectangle(box, radius=pad, fill=(255, 255, 255), outline=(0, 0, 0), width=border)
     im.paste(b, (x0, y0), b)
     return im
 
