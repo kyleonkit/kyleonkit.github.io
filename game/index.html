@@ -8,11 +8,11 @@
   <meta name="theme-color" content="#000000">
   <meta property="og:title" content="Be Kyle">
   <meta property="og:description" content="Tap along to Kyle on Kit's drum parts.">
-  <link rel="icon" type="image/png" href="../assets/favicon.png?v=20261125130012">
+  <link rel="icon" type="image/png" href="../assets/favicon.png?v=20261125145534">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,700;0,900;1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="game.css?v=20261125130012">
+  <link rel="stylesheet" href="game.css?v=20261125145534">
 </head>
 <body>
   <!-- ───────── Song select ───────── -->
@@ -46,7 +46,7 @@
     </div>
     <div class="stage" id="stage">
       <canvas id="hw"></canvas>
-      <button class="sp-btn" id="spBtn">STAR POWER</button>
+      <button class="sp-btn" id="spBtn">STAR POWER<kbd>ENTER</kbd></button>
       <div class="center-msg" id="centerMsg"></div>
     </div>
   </section>
@@ -74,6 +74,7 @@
     <div class="panel menu">
       <h2>Paused</h2>
       <button class="btn primary" id="resume">Resume</button>
+      <p class="hint key-hint">Esc / P pauses · Resume returns to full screen</p>
       <button class="btn" id="restart">Restart</button>
       <button class="btn" id="pauseSettings">Settings</button>
       <button class="btn" id="quit">Quit to Setlist</button>
@@ -106,6 +107,6 @@
     </div>
   </div>
 
-  <script src="game.js?v=20261125130012"></script>
+  <script src="game.js?v=20261125145534"></script>
 </body>
 </html>

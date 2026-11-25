@@ -9,8 +9,8 @@ What it does
      converts note-ons to seconds with the project tempo map.
   2. Maps drum notes to the 5 lanes (kick, snare, tom1, tom2, cymbal). Default map
      covers GetGood Drums (GGD) + General MIDI; override with --map.
-  3. Finds where the video starts on the project timeline by matching the video's
-     audio against the kick/snare hits (or use --offset SECONDS).
+  3. Finds where the video starts on the project timeline by matching the kick MIDI
+     against the low end (30-120 Hz) of the video's audio (or use --offset SECONDS).
   4. Assigns each note a difficulty tier: 0 = Easy (~50%), 1 = Medium (~75%), 2 = Kyle (all).
   5. Writes game/songs/<id>/chart.json, video.mp4 (540p, web-optimised), cover.jpg,
      and adds/updates the song in game/songs/songs.json.
@@ -23,8 +23,6 @@ import math
 import os
 import subprocess
 import sys
-import tempfile
-import wave
 
 import numpy as np
 
@@ -32,14 +30,46 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SONGS = os.path.join(ROOT, "game", "songs")
 LANES = ["kick", "snare", "tom1", "tom2", "cymbal"]
 
-# MIDI note -> lane index. GGD (GetGood Drums, Kontakt) + General MIDI.
-DEFAULT_MAP = {}
-for n in (24, 35, 36): DEFAULT_MAP[n] = 0                       # kick
-for n in (26, 37, 38, 39, 40): DEFAULT_MAP[n] = 1               # snare / rim / clap
-for n in (47, 48, 50): DEFAULT_MAP[n] = 2                       # high / mid toms
-for n in (41, 43, 45): DEFAULT_MAP[n] = 3                       # low / floor toms
-# everything else in the drum range (hats, rides, crashes, chinas, splashes...) -> cymbal
-CYMBAL_FALLBACK = range(42, 128)
+# MIDI note -> lane index. Normally read from the drum track's note names
+# (REAPER <MIDINOTENAMES>, see lane_for_name); this GGD map is the fallback.
+# Cymbal lane = crash accents only. Hats, ride, bell, chinas, stack, splash
+# and "grab" chokes are left out on purpose (Kyle's call, 2026-11-25).
+DEFAULT_MAP = {24: 0, 26: 1, 35: 2, 36: 3, 52: 4, 54: 4, 58: 4}
+
+
+def lane_for_name(name):
+    n = name.lower()
+    if "grab" in n or "choke" in n:
+        return None
+    if "kick" in n:
+        return 0
+    if "snare" in n:
+        return 1
+    if "rack" in n or n in ("tom 1", "tom1", "hi tom", "high tom"):
+        return 2
+    if "floor" in n or n in ("tom 2", "tom2", "low tom"):
+        return 3
+    if "crash" in n:
+        return 4
+    return None
+
+
+def track_note_map(proj, track_name):
+    for tr in proj.find("TRACK"):
+        if unquote(tr.val("NAME")) != track_name:
+            continue
+        for nn in tr.find("MIDINOTENAMES"):
+            m = {}
+            for l in nn.lines:
+                p = l.split(" ", 2)
+                if len(p) == 3:
+                    name = unquote(p[2].rsplit(" ", 2)[0])
+                    lane = lane_for_name(name)
+                    if lane is not None:
+                        m[int(p[1])] = lane
+            if m:
+                return m
+    return None
 
 
 # ── REAPER project parsing ────────────────────────────────────────────────
@@ -88,13 +118,17 @@ class TempoMap:
     def __init__(self, proj):
         t = proj.val("TEMPO").split()
         self.bpm0, self.num, self.den = float(t[0]), int(t[1]), int(t[2])
-        pts = []
+        pts, sigs = [], []
         for env in proj.find("TEMPOENVEX"):
             for l in env.lines:
                 if l.startswith("PT "):
                     p = l.split()
                     pts.append((float(p[1]), float(p[2]), int(p[3]) if len(p) > 3 else 0))
+                    ts = int(p[4]) if len(p) > 4 else 0
+                    if ts:                       # num | den << 16
+                        sigs.append((float(p[1]), ts & 0xFFFF, ts >> 16))
         pts.sort()
+        self._sig_secs = sorted(sigs)
         if not pts or pts[0][0] > 0:
             pts.insert(0, (0.0, pts[0][1] if pts else self.bpm0, 1))
         self.pts = pts
@@ -102,6 +136,21 @@ class TempoMap:
         self.beats = [0.0]
         for i in range(1, len(pts)):
             self.beats.append(self.beats[-1] + self._seg_beats(i - 1, pts[i][0] - pts[i - 1][0]))
+        # Time signatures as (start quarter-note beat, bar length in QN, first bar index)
+        sig = [(0.0, self.num, self.den)] + [(self.beat_at(t), n, d) for t, n, d in self._sig_secs]
+        sig = [s for i, s in enumerate(sig) if i == len(sig) - 1 or sig[i + 1][0] > s[0] + 1e-6]
+        self.sigs, bar = [], 0
+        for i, (b, n, d) in enumerate(sig):
+            blen = n * 4 / d
+            self.sigs.append((b, blen, bar))
+            if i + 1 < len(sig):
+                bar += math.ceil((sig[i + 1][0] - b) / blen - 1e-6)
+
+    def bar_at(self, beat):
+        """(bar index, position in bar in QN, bar length in QN)"""
+        b0, blen, bar0 = [s for s in self.sigs if s[0] <= beat + 1e-6][-1] if beat >= 0 else self.sigs[0]
+        k = math.floor((beat - b0) / blen + 1e-6)
+        return bar0 + k, beat - b0 - k * blen, blen
 
     def _seg_beats(self, i, dt):
         t0, b0, shape = self.pts[i]
@@ -169,77 +218,87 @@ def midi_notes(proj, track_name, tempo):
 
 
 # ── Video alignment ───────────────────────────────────────────────────────
-def onset_envelope(video, sr=11025, hop=22):
-    with tempfile.TemporaryDirectory() as td:
-        wav = os.path.join(td, "a.wav")
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", video, "-vn", "-ac", "1", "-ar", str(sr), wav], check=True)
-        w = wave.open(wav)
-        x = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32)
-        w.close()
-    n = len(x) // hop
-    e = np.log1p((x[: n * hop].reshape(n, hop) ** 2).mean(1))
-    e = np.convolve(e, np.ones(3) / 3, "same")
+def kick_envelope(video, sr=8000, hop=40, nfft=512):
+    """Onset strength of the 30-120 Hz band (where the kick drum lives), 200 frames/s."""
+    x = np.frombuffer(subprocess.run(["ffmpeg", "-v", "error", "-i", video, "-vn", "-ac", "1", "-ar", str(sr),
+                                      "-f", "f32le", "-"], capture_output=True, check=True).stdout, np.float32)
+    n = (len(x) - nfft) // hop
+    frames = np.lib.stride_tricks.sliding_window_view(x, nfft)[::hop][:n] * np.hanning(nfft)
+    S = np.abs(np.fft.rfft(frames, axis=1))
+    f = np.fft.rfftfreq(nfft, 1 / sr)
+    e = np.log1p(100 * S[:, (f >= 30) & (f < 120)].sum(1))
     return np.maximum(0, np.diff(e, prepend=e[0])), sr / hop
 
 
-def find_offset(video, times):
-    """Seconds to ADD to project time to get video time."""
-    on, fps = onset_envelope(video)
-    T = np.array(times)
-    n = len(on)
+def find_offset(video, kicks, lo=-30.0, hi=30.0):
+    """Seconds to ADD to project time to get video time, by lining the kick MIDI up with
+    the low end of the video's audio. Much more reliable than the full mix: kick patterns
+    aren't periodic at the beat, so it doesn't lock onto a neighbouring beat.
+    Returns (offset, agreement) where agreement = share of 20 s windows that agree."""
+    E, fps = kick_envelope(video)
+    T = np.array(kicks)
 
-    def score(lag, win):
-        idx = np.round((T + lag) * fps).astype(int)
-        idx = idx[(idx >= win) & (idx < n - win)]
-        if win == 0:
-            return on[idx].sum()
-        return sum(on[i - win:i + win + 1].max() for i in idx)
+    def score(Tw, g):
+        idx = np.round((Tw + g) * fps).astype(int)
+        idx = idx[(idx >= 2) & (idx < len(E) - 2)]
+        return np.mean([E[j - 2:j + 3].max() for j in idx]) if len(idx) else 0.0
 
-    coarse = sorted(((score(l, 0), l) for l in np.arange(-30, 30, 0.01)), reverse=True)
-    lag0 = coarse[0][1]
-    fine = sorted(((score(l, 3), l) for l in np.arange(lag0 - 0.05, lag0 + 0.05, 0.002)), reverse=True)
-    conf = coarse[0][0] / max(1e-9, coarse[1][0] if abs(coarse[1][1] - lag0) > 0.05 else coarse[2][0])
-    return round(float(fine[0][1]), 4), conf
+    coarse = np.arange(lo, hi, 0.01)
+    g0 = coarse[int(np.argmax([score(T, g) for g in coarse]))]
+    fine = np.arange(g0 - 0.03, g0 + 0.03, 0.002)
+    g0 = float(fine[int(np.argmax([score(T, g) for g in fine]))])
+    agree = total = 0
+    for w0 in np.arange(T[0], T[-1], 20):
+        Tw = T[(T >= w0) & (T < w0 + 20)]
+        if len(Tw) < 10 or (Tw[0] + g0) * fps >= len(E):
+            continue
+        g = np.arange(g0 - 0.6, g0 + 0.6, 0.004)
+        best = g[int(np.argmax([score(Tw, k) for k in g]))]
+        total += 1
+        agree += abs(best - g0) < 0.015
+    # Frames are stamped at the window start; the onset is detected ~half a window (32 ms) early
+    return round(g0 + 0.032, 4), (agree / total if total else 0.0)
 
 
 # ── Difficulty tiers ──────────────────────────────────────────────────────
 def assign_tiers(notes, tempo):
     """notes: list of dicts with t (project s), lane, vel. Adds 'tier' in place.
-    Within each bar, notes are ranked by importance; the top 50% are Easy,
-    the next 25% Medium, the rest Kyle-only."""
-    lane_w = [2.0, 2.2, 1.4, 1.4, 1.0]
-    bars = {}
+      0 Easy   - quarter notes only (max 2 pads at once). An offbeat 8th is added
+                 only where it "warrants" it: when nothing lands on that quarter
+                 (pushes, syncopated accents).
+      1 Medium - everything on the 8th-note grid (max 3 pads at once).
+      2 Kyle   - every note."""
+    lane_w = [2.0, 2.2, 1.4, 1.4, 2.1]          # kick, snare, tom1, tom2, crash
+    TOL = 0.06                                   # quantise tolerance in quarter notes
     for nt in notes:
         beat = tempo.beat_at(nt["t"])
-        bar = int(beat // tempo.num)
-        pos = beat - bar * tempo.num
-        frac = pos % 1
-        if abs(pos) < 0.02:
-            metric = 5
-        elif frac < 0.02 or frac > 0.98:
-            metric = 4 if int(round(pos)) % 2 == 0 else 3.5
-        elif abs(frac - 0.5) < 0.02:
-            metric = 2.5
-        elif abs(frac - 0.25) < 0.02 or abs(frac - 0.75) < 0.02:
-            metric = 1
-        else:
-            metric = 1.5  # triplets etc.
-        nt["_score"] = metric * 4 + lane_w[nt["lane"]] + nt["vel"] / 127
-        bars.setdefault(bar, []).append(nt)
-    for group in bars.values():
-        group.sort(key=lambda n: (-n["_score"], n["t"]))
-        k = len(group)
-        e, m = math.ceil(k * 0.5), math.ceil(k * 0.75)
-        for r, nt in enumerate(group):
-            nt["tier"] = 0 if r < e else 1 if r < m else 2
-    # Easy: never more than 2 pads at once
-    by_time = {}
+        nt["_q"] = math.floor(beat + TOL)        # which quarter note it belongs to
+        frac = beat - nt["_q"]
+        triplet = abs(frac - 1 / 3) < TOL or abs(frac - 2 / 3) < TOL
+        nt["_grid"] = 4 if frac < TOL else 8 if abs(frac - 0.5) < TOL or triplet else 16
+        nt["_score"] = lane_w[nt["lane"]] + nt["vel"] / 127
+        nt["tier"] = 2
+
+    def cap(chord_notes, k, tier):
+        by_time = {}
+        for nt in chord_notes:
+            by_time.setdefault(round(nt["t"], 3), []).append(nt)
+        for chord in by_time.values():
+            chord.sort(key=lambda n: -n["_score"])
+            for nt in chord[:k]:
+                nt["tier"] = min(nt["tier"], tier)
+
+    # Medium: 8th grid
+    cap([n for n in notes if n["_grid"] <= 8], 3, 1)
+    # Easy: quarters, plus the offbeat 8th of any quarter that has nothing on the beat
+    quarters = {}
     for nt in notes:
-        by_time.setdefault(round(nt["t"], 3), []).append(nt)
-    for chord in by_time.values():
-        easy = sorted([n for n in chord if n["tier"] == 0], key=lambda n: -n["_score"])
-        for nt in easy[2:]:
-            nt["tier"] = 1
+        quarters.setdefault(nt["_q"], []).append(nt)
+    easy = []
+    for q in quarters.values():
+        on_beat = [n for n in q if n["_grid"] == 4]
+        easy += on_beat or [n for n in q if n["_grid"] == 8]
+    cap(easy, 2, 0)
 
 
 # ── Main ──────────────────────────────────────────────────────────────────
@@ -262,18 +321,20 @@ def main():
     raw = midi_notes(proj, a.track, tempo)
     print(f"{len(raw)} drum hits on track {a.track!r}, tempo {tempo.bpm0} {tempo.num}/{tempo.den}")
 
-    nmap = dict(DEFAULT_MAP)
+    nmap = track_note_map(proj, a.track)
+    print(f"  note map from track names: {nmap}" if nmap else "  no note names on track; using GGD default map")
+    nmap = nmap or dict(DEFAULT_MAP)
     if a.map:
         nmap.update({int(k): v for k, v in json.loads(a.map).items()})
     notes, unmapped = [], {}
     for t, n, v in raw:
-        lane = nmap.get(n, 4 if n in CYMBAL_FALLBACK else None)
+        lane = nmap.get(n)
         if lane is None:
             unmapped[n] = unmapped.get(n, 0) + 1
             continue
         notes.append({"t": t, "lane": lane, "vel": v})
     if unmapped:
-        print("  unmapped notes (ignored):", unmapped)
+        print("  not charted (hats/ride/etc):", dict(sorted(unmapped.items())))
     # Merge same-lane hits closer than 45 ms (flams, layered cymbals)
     notes.sort(key=lambda n: (n["lane"], n["t"]))
     merged = []
@@ -286,9 +347,9 @@ def main():
     assign_tiers(notes, tempo)
 
     if a.offset is None:
-        hits = [n["t"] for n in notes if n["lane"] in (0, 1)]
-        offset, conf = find_offset(a.video, hits)
-        print(f"auto offset: video = project {offset:+.3f}s (confidence {conf:.2f}; >1.05 is good)")
+        kicks = [n["t"] for n in notes if n["lane"] == 0]
+        offset, agree = find_offset(a.video, kicks)
+        print(f"auto offset: video = project {offset:+.3f}s ({agree:.0%} of 20 s windows agree; want 80%+)")
     else:
         offset = a.offset
 
@@ -301,18 +362,20 @@ def main():
         if t > dur:
             break
         if t >= 0:
-            beats.append([round(t, 4), 1 if b % tempo.num == 0 else 0])
+            pos = tempo.bar_at(b)[1]
+            beats.append([round(t, 4), 1 if pos < 1e-6 else 0])
         b += 1
 
+    notes = [n for n in notes if 0 <= n["t"] + offset < dur - 0.5]     # only what's in the video
     counts = [sum(1 for n in notes if n["tier"] <= k) for k in range(3)]
     chart = {
         "id": a.id, "title": a.title, "artist": a.artist,
-        "bpm": tempo.bpm0, "duration": round(dur, 3), "offset": offset,
+        "bpm": tempo.pts[0][1], "duration": round(dur, 3), "offset": offset,
         "lanes": LANES,
         "counts": {"easy": counts[0], "medium": counts[1], "kyle": counts[2]},
         "beats": beats,
         # [video_seconds, lane, tier]   tier 0 = easy+, 1 = medium+, 2 = kyle only
-        "notes": [[round(n["t"] + offset, 4), n["lane"], n["tier"]] for n in notes if n["t"] + offset >= 0],
+        "notes": [[round(n["t"] + offset, 4), n["lane"], n["tier"]] for n in notes if 0 <= n["t"] + offset < dur - 0.5],
     }
     out = os.path.join(SONGS, a.id)
     os.makedirs(out, exist_ok=True)
@@ -335,9 +398,13 @@ def main():
     # Song list
     lst_path = os.path.join(SONGS, "songs.json")
     lst = json.load(open(lst_path)) if os.path.exists(lst_path) else {"songs": []}
-    entry = {"id": a.id, "title": a.title, "artist": a.artist, "bpm": tempo.bpm0,
+    entry = {"id": a.id, "title": a.title, "artist": a.artist, "bpm": tempo.pts[0][1],
              "duration": round(dur, 1), "counts": chart["counts"]}
-    lst["songs"] = [s for s in lst["songs"] if s["id"] != a.id] + [entry]
+    ids = [s["id"] for s in lst["songs"]]
+    if a.id in ids:
+        lst["songs"][ids.index(a.id)] = entry          # keep its place in the setlist
+    else:
+        lst["songs"].append(entry)
     with open(lst_path, "w") as f:
         json.dump(lst, f, indent=2)
     print("songs.json updated")

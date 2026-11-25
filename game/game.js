@@ -13,10 +13,28 @@
     { name: "TOM 2",  key: "J",     color: "#1f6ff2", dark: "#0a2f73", light: "#a8c8ff" },
     { name: "CYMBAL", key: "K",     color: "#ff8a12", dark: "#7a3a00", light: "#ffd09c" },
   ];
+  // Desktop (mouse + keyboard): show keycaps; on wide windows go full screen with the video behind the highway
+  const KEYS = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  let DESK = false;
+  function updateDesk() {
+    DESK = KEYS && innerWidth >= 900;
+    document.body.classList.toggle("desk", DESK);
+    document.body.classList.toggle("keys", KEYS);
+  }
+  updateDesk();
+  function enterFull() {
+    const el = document.documentElement;
+    if (DESK && !document.fullscreenElement && el.requestFullscreen) el.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+  }
+  function exitFull() {
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  }
+  // Esc leaves full screen before the page sees the key: treat it as pause
+  document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement) pause(); });
   const KEYMAP = { Space: 0, KeyS: 0, KeyD: 1, KeyF: 2, KeyJ: 3, KeyK: 4, KeyL: 4 };
   const DIFFS = {
-    easy:   { label: "Easy",   tier: 0, look: 1.9,  miss: 0.018, hint: "Half the notes, slower highway." },
-    medium: { label: "Medium", tier: 1, look: 1.6,  miss: 0.024, hint: "Three quarters of the notes." },
+    easy:   { label: "Easy",   tier: 0, look: 1.9,  miss: 0.018, hint: "Quarter notes (a few 8ths where the groove needs them), slower highway." },
+    medium: { label: "Medium", tier: 1, look: 1.6,  miss: 0.024, hint: "Everything on the 8th-note grid." },
     kyle:   { label: "Kyle",   tier: 2, look: 1.3,  miss: 0.032, hint: "Every note Kyle plays. Good luck." },
   };
   const WINDOW = 0.1;           // ± seconds to count a hit
@@ -29,7 +47,8 @@
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
   };
-  const settings = Object.assign({ diff: "medium", delay: 0, noFail: false }, store.get("bk.settings", {}));
+  const settings = Object.assign({ diff: "easy", delay: 0, noFail: false }, store.get("bk.settings", {}));
+  if (settings.v !== 2) { settings.diff = "easy"; settings.v = 2; }   // v2: Easy became the default
   if (!DIFFS[settings.diff]) settings.diff = "medium";
   const saveSettings = () => store.set("bk.settings", settings);
 
@@ -150,6 +169,7 @@
     const p = video.play();
     if (p && p.then) p.then(() => { if (!G || G.phase === "lead") { video.pause(); video.currentTime = 0; } }).catch(() => {});
     $("loading").hidden = true;
+    enterFull();
     startRun();
   });
 
@@ -341,6 +361,7 @@
   }
   function resume() {
     $("pause").hidden = true;
+    enterFull();
     if (!G || G.phase !== "paused") return;
     if (G.pausedPhase === "lead") {
       G.leadStart = performance.now() - (G.pausedLeadT + LEAD + settings.delay / 1000) * 1000;
@@ -362,6 +383,7 @@
   document.addEventListener("visibilitychange", () => { if (document.hidden) pause(); });
 
   function quit() {
+    exitFull();
     if (G) G.done = true;
     G = null;
     video.pause();
@@ -433,12 +455,12 @@
     canvas.width = W;
     canvas.height = H;
   }
-  window.addEventListener("resize", resize);
+  window.addEventListener("resize", () => { updateDesk(); resize(); });
 
   // Perspective: s = 1 at the strike line, S_FAR at the far end
   const S_FAR = 0.3;
   function geom() {
-    const labelH = 26 * DPR;
+    const labelH = (KEYS ? 56 : 26) * DPR;
     const yStrike = H - labelH - 34 * DPR;
     const yTop = H * 0.04;
     const wNear = W * 0.96;
@@ -498,10 +520,10 @@
     const bg = ctx.createLinearGradient(0, 0, 0, H);
     bg.addColorStop(0, sp ? "#03131c" : "#0b0705");
     bg.addColorStop(1, "#000");
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
+    if (!DESK) { ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H); }
     // Light rays
     ctx.save();
+    if (DESK) ctx.globalAlpha = 0.5;
     ctx.globalCompositeOperation = "lighter";
     for (let i = 0; i < 4; i++) {
       const a = Math.sin(now / 1900 + i * 1.7) * 0.35;
@@ -641,8 +663,25 @@
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     for (let l = 0; l < 5; l++) {
-      ctx.fillStyle = G.pressed[l] && now - G.pressed[l] < 120 ? LANES[l].light : "rgba(255,255,255,0.55)";
-      ctx.fillText(LANES[l].name, xAt(g, l + 0.5, 1), H - g.labelH / 2 - 2 * DPR);
+      const lit = G.pressed[l] && now - G.pressed[l] < 120;
+      const x = xAt(g, l + 0.5, 1);
+      ctx.fillStyle = lit ? LANES[l].light : "rgba(255,255,255,0.55)";
+      if (!KEYS) { ctx.fillText(LANES[l].name, x, H - g.labelH / 2 - 2 * DPR); continue; }
+      ctx.fillText(LANES[l].name, x, H - g.labelH + 10 * DPR);
+      // Keycap
+      const k = LANES[l].key.toUpperCase();
+      ctx.font = `900 ${12 * DPR}px Montserrat, sans-serif`;
+      const kw = Math.max(26 * DPR, ctx.measureText(k).width + 16 * DPR), kh = 24 * DPR;
+      const ky = H - kh - 6 * DPR;
+      roundRect(x - kw / 2, ky, kw, kh, 5 * DPR);
+      ctx.fillStyle = lit ? LANES[l].color : "rgba(255,255,255,0.08)";
+      ctx.fill();
+      ctx.lineWidth = 1.5 * DPR;
+      ctx.strokeStyle = lit ? LANES[l].light : LANES[l].color;
+      ctx.stroke();
+      ctx.fillStyle = lit ? "#000" : "#fff";
+      ctx.fillText(k, x, ky + kh / 2 + 1 * DPR);
+      ctx.font = `900 ${10.5 * DPR}px Montserrat, sans-serif`;
     }
 
     drawHUD(g, now);

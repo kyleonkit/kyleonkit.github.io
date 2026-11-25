@@ -2,14 +2,134 @@
   "songs": [
     {
       "id": "flowerman",
-      "title": "Flower Man",
+      "title": "Flower Man (Deltarune)",
       "artist": "Lame Genie",
       "bpm": 160.0,
       "duration": 213.7,
       "counts": {
-        "easy": 1024,
-        "medium": 1546,
-        "kyle": 1994
+        "easy": 678,
+        "medium": 1155,
+        "kyle": 1650
+      }
+    },
+    {
+      "id": "windscene",
+      "title": "Wind Scene (Chrono Trigger)",
+      "artist": "Lame Genie",
+      "bpm": 168.0,
+      "duration": 135.2,
+      "counts": {
+        "easy": 319,
+        "medium": 429,
+        "kyle": 465
+      }
+    },
+    {
+      "id": "frogs",
+      "title": "Frog's Theme (Chrono Trigger)",
+      "artist": "Lame Genie",
+      "bpm": 124.5,
+      "duration": 138.4,
+      "counts": {
+        "easy": 336,
+        "medium": 640,
+        "kyle": 668
+      }
+    },
+    {
+      "id": "corridors",
+      "title": "Corridors of Time (Chrono Trigger)",
+      "artist": "Lame Genie",
+      "bpm": 111.0,
+      "duration": 141.7,
+      "counts": {
+        "easy": 321,
+        "medium": 487,
+        "kyle": 658
+      }
+    },
+    {
+      "id": "snowfield",
+      "title": "Snow Field (Contra)",
+      "artist": "Lame Genie",
+      "bpm": 75.0,
+      "duration": 137.8,
+      "counts": {
+        "easy": 251,
+        "medium": 598,
+        "kyle": 1054
+      }
+    },
+    {
+      "id": "hopes",
+      "title": "Hopes and Dreams (Undertale)",
+      "artist": "Lame Genie",
+      "bpm": 171.0,
+      "duration": 181.1,
+      "counts": {
+        "easy": 546,
+        "medium": 855,
+        "kyle": 1005
+      }
+    },
+    {
+      "id": "f13",
+      "title": "Friday the 13th Medley (NES)",
+      "artist": "Lame Genie",
+      "bpm": 113.0,
+      "duration": 167.7,
+      "counts": {
+        "easy": 416,
+        "medium": 740,
+        "kyle": 1077
+      }
+    },
+    {
+      "id": "unevie",
+      "title": "Une Vie \u00e0 Peindre (Expedition 33)",
+      "artist": "Lame Genie",
+      "bpm": 92.0,
+      "duration": 626.0,
+      "counts": {
+        "easy": 1208,
+        "medium": 2385,
+        "kyle": 3741
+      }
+    },
+    {
+      "id": "sherma",
+      "title": "Sherma (Silksong)",
+      "artist": "Lame Genie",
+      "bpm": 110.0,
+      "duration": 71.4,
+      "counts": {
+        "easy": 177,
+        "medium": 274,
+        "kyle": 399
+      }
+    },
+    {
+      "id": "chronos",
+      "title": "Death to Chronos (Hades II)",
+      "artist": "Lame Genie",
+      "bpm": 170.0,
+      "duration": 217.7,
+      "counts": {
+        "easy": 751,
+        "medium": 1209,
+        "kyle": 1301
+      }
+    },
+    {
+      "id": "lace",
+      "title": "Lace (Silksong)",
+      "artist": "Lame Genie",
+      "bpm": 153.0,
+      "duration": 174.4,
+      "counts": {
+        "easy": 638,
+        "medium": 1084,
+        "kyle": 1410
       }
     }
   ]

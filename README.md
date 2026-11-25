@@ -28,10 +28,17 @@ python tools/build_song.py --id <id> --title "<Title>" --artist "Lame Genie" \
     --rpp "<path to the .rpp>" --track GGD --video "<path to the final video .mp4>"
 ```
 
-It reads the drum MIDI from `--track` (GetGood Drums / General MIDI notes → Kick, Snare, Tom 1, Tom 2, Cymbal),
-lines the notes up with the video automatically (prints the offset; pass `--offset` to override),
-assigns Easy (~50%) / Medium (~75%) / Kyle (all) tiers, encodes the video and updates `songs.json`.
+It reads the drum MIDI from `--track` and maps notes by the track's REAPER note names (KICK, SNARE,
+RACK → Tom 1, FLOOR → Tom 2, CRASH L/R/R2 → Cymbal). Hats, ride, bell, chinas, stack, splash and
+"grab" chokes are deliberately not charted. Without note names it falls back to the GGD numbers.
+Sync: lines the kick MIDI up with the 30–120 Hz band of the video's audio and prints the offset plus
+how many 20 s windows agree (want 80%+; pass `--offset` to override). Notes after the video ends are dropped.
+Tiers: Easy = quarter notes (an offbeat 8th only where nothing hits on that quarter; max 2 pads),
+Medium = the 8th / triplet-8th grid (max 3 pads), Kyle = everything.
+It also encodes the video (540p; GitHub's per-file limit is 100 MB) and updates `songs.json`.
 Where each song came from is saved locally (not published) in `tools/song-sources.local.json`.
 Then `bash deploy.sh "Add <song>"`.
+
+Desktop (mouse + keyboard, window ≥ 900 px): plays full screen with the video behind the highway; keys shown under each lane.
 
 Testing: `game/?debug&mute` exposes `window.__bk` and plays muted.

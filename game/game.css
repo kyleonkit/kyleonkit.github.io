@@ -407,3 +407,46 @@ input[type="range"] { width: 100%; margin-top: 10px; accent-color: var(--yellow)
 .res-grid div { padding: 10px; border-radius: 12px; background: var(--tile); border: 1px solid #474747; }
 .res-grid b { display: block; font-size: 22px; font-weight: 900; }
 .res-grid span { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--yellow); }
+
+/* ───────── Desktop: keyboard hints + full-screen stage ───────── */
+.sp-btn kbd, .key-hint { display: none; }
+body.keys .sp-btn kbd {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1.5px solid currentColor;
+  border-radius: 5px;
+  font: 900 10px/1.4 Montserrat, sans-serif;
+  vertical-align: 2px;
+}
+body.keys .key-hint { display: block; text-align: center; margin: -2px 0 6px; }
+
+body.desk #game .video-wrap {
+  position: absolute;
+  inset: 0;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  padding: 0;
+}
+body.desk #game .video-wrap video { object-fit: cover; }
+/* darken the edges a little so the highway reads, keep the band visible */
+body.desk #game .video-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 34% 90% at 50% 100%, rgba(0,0,0,0.55), rgba(0,0,0,0) 100%),
+              linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.5));
+}
+body.desk #game .pause-btn { top: 16px; right: 16px; z-index: 2; }
+body.desk #game .song-tag { left: 20px; bottom: auto; top: 20px; font-size: 14px; z-index: 2; }
+body.desk #game .stage {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(760px, 52vw);
+  max-width: none;
+}
