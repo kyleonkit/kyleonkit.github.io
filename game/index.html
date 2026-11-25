@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Be Kyle</title>
+  <meta name="description" content="Be Kyle: tap along to Kyle's drum parts.">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:title" content="Be Kyle">
+  <meta property="og:description" content="Tap along to Kyle on Kit's drum parts.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png?v=20261125130012">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,700;0,900;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="game.css?v=20261125130012">
+</head>
+<body>
+  <!-- ───────── Song select ───────── -->
+  <section id="select" class="screen active">
+    <header class="sel-top">
+      <a class="icon-btn" href="../" aria-label="Back to links">
+        <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg>
+      </a>
+      <button class="icon-btn" id="openSettings" aria-label="Settings">
+        <svg viewBox="0 0 24 24" style="stroke-width:2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </header>
+    <h1 class="title"><span>BE</span> KYLE</h1>
+    <p class="tag">Tap along to Kyle's drum parts</p>
+
+    <div class="diff" id="diffSel" role="radiogroup" aria-label="Difficulty"></div>
+
+    <h2 class="sec">Setlist</h2>
+    <ol class="songs" id="songs"></ol>
+    <p class="how">Tap the lanes when the notes hit the line.<br><span class="keys">Keyboard: <b>Space</b> kick · <b>D</b> snare · <b>F</b> tom 1 · <b>J</b> tom 2 · <b>K</b> cymbal · <b>Enter</b> star power</span></p>
+  </section>
+
+  <!-- ───────── Game ───────── -->
+  <section id="game" class="screen">
+    <div class="video-wrap">
+      <video id="video" playsinline webkit-playsinline preload="auto"></video>
+      <button class="icon-btn pause-btn" id="pauseBtn" aria-label="Pause">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>
+      </button>
+      <div class="song-tag" id="songTag"></div>
+    </div>
+    <div class="stage" id="stage">
+      <canvas id="hw"></canvas>
+      <button class="sp-btn" id="spBtn">STAR POWER</button>
+      <div class="center-msg" id="centerMsg"></div>
+    </div>
+  </section>
+
+  <!-- ───────── Overlays ───────── -->
+  <div class="overlay" id="settings" hidden>
+    <div class="panel">
+      <h2>Settings</h2>
+      <label class="row-label">Difficulty</label>
+      <div class="diff" id="diffSet"></div>
+      <p class="hint" id="diffHint"></p>
+
+      <label class="row-label" for="delay">Audio delay <span id="delayVal">0 ms</span></label>
+      <input type="range" id="delay" min="-300" max="300" step="5" value="0">
+      <p class="hint">If notes feel early or late (e.g. on Bluetooth headphones), slide this until hits line up with the music.</p>
+
+      <label class="toggle"><input type="checkbox" id="noFail"> <span>No Fail</span></label>
+      <p class="hint">Keep playing even if the rock meter runs out.</p>
+
+      <button class="btn primary" id="closeSettings">Done</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="pause" hidden>
+    <div class="panel menu">
+      <h2>Paused</h2>
+      <button class="btn primary" id="resume">Resume</button>
+      <button class="btn" id="restart">Restart</button>
+      <button class="btn" id="pauseSettings">Settings</button>
+      <button class="btn" id="quit">Quit to Setlist</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="results" hidden>
+    <div class="panel results">
+      <h2 id="resTitle">Song Complete!</h2>
+      <div class="res-song" id="resSong"></div>
+      <div class="stars" id="resStars"></div>
+      <div class="res-score" id="resScore">0</div>
+      <div class="res-new" id="resNew" hidden>NEW HIGH SCORE!</div>
+      <div class="res-grid">
+        <div><b id="resPct">0%</b><span>Notes hit</span></div>
+        <div><b id="resStreak">0</b><span>Best streak</span></div>
+      </div>
+      <button class="btn primary" id="retry">Retry</button>
+      <button class="btn" id="toSongs">Setlist</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="loading" hidden>
+    <div class="panel menu">
+      <div class="spinner"></div>
+      <h2 id="loadTitle">Loading…</h2>
+      <p class="hint" id="loadHint"></p>
+      <button class="btn primary" id="startBtn" hidden>Tap to Rock</button>
+      <button class="btn" id="cancelLoad">Back</button>
+    </div>
+  </div>
+
+  <script src="game.js?v=20261125130012"></script>
+</body>
+</html>

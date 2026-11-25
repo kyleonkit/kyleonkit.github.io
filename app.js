@@ -10,6 +10,7 @@
     cart: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h12L22 7H6"/>',
     music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
     globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+    drum: '<ellipse cx="12" cy="9" rx="8" ry="3"/><path d="M4 9v7c0 1.7 3.6 3 8 3s8-1.3 8-3V9"/><path d="M4 12.5c0 1.7 3.6 3 8 3s8-1.3 8-3"/><path d="m6 2.5 5 5.5M18 2.5 13 8"/>',
   };
 
   function iconEl(name) {
@@ -34,7 +35,7 @@
     const a = document.createElement("a");
     if (url) {
       a.href = url;
-      if (!url.startsWith("mailto:") && !url.startsWith("#")) {
+      if (/^https?:/.test(url)) {
         a.target = "_blank";
         a.rel = "noopener";
       }
@@ -170,7 +171,7 @@
     }
 
     const a = anchor(l.url);
-    a.className += " card" + (l.featured ? " featured" : "");
+    a.className += " card" + (l.featured ? " featured" : "") + (l.style ? " " + l.style : "");
     a.appendChild(iconEl(l.icon));
 
     const text = document.createElement("span");

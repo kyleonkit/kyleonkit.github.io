@@ -1,0 +1,16 @@
+{
+  "songs": [
+    {
+      "id": "flowerman",
+      "title": "Flower Man",
+      "artist": "Lame Genie",
+      "bpm": 160.0,
+      "duration": 213.7,
+      "counts": {
+        "easy": 1024,
+        "medium": 1546,
+        "kyle": 1994
+      }
+    }
+  ]
+}

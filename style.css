@@ -177,6 +177,40 @@ body {
 }
 .card.featured:not(.soon):hover .arrow { color: #000; }
 
+/* Game button ("Be Kyle"): fiery border + moving shine */
+.card.game {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(90deg, #ffd000, #ff7a00, #ff2d2d, #ff7a00, #ffd000) border-box;
+  background-size: 100% 100%, 200% 100%;
+  animation: gameBorder 3s linear infinite;
+  box-shadow: 0 0 22px rgba(255, 110, 0, 0.35), var(--shadow);
+}
+.card.game::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 220, 120, 0.18) 50%, transparent 60%);
+  transform: translateX(-100%);
+  animation: gameShine 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.card.game .title {
+  font-style: italic;
+  font-size: 18px;
+  background: linear-gradient(180deg, #fff6c8, #ffd000 45%, #ff7a00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.card.game .ico { color: #ff9a1a; }
+@keyframes gameBorder { to { background-position: 0 0, 200% 0; } }
+@keyframes gameShine { 0%, 55% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .card.game, .card.game::after { animation: none; } }
+
 /* Section heading */
 .links .heading { margin-top: 18px; }
 .links .heading h2 {
