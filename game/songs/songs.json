@@ -8,7 +8,7 @@
       "duration": 213.7,
       "counts": {
         "easy": 673,
-        "medium": 1150,
+        "medium": 1402,
         "kyle": 1645
       }
     },
@@ -20,7 +20,7 @@
       "duration": 135.2,
       "counts": {
         "easy": 314,
-        "medium": 424,
+        "medium": 450,
         "kyle": 460
       }
     },
@@ -44,7 +44,7 @@
       "duration": 141.7,
       "counts": {
         "easy": 318,
-        "medium": 484,
+        "medium": 553,
         "kyle": 655
       }
     },
@@ -56,7 +56,7 @@
       "duration": 137.8,
       "counts": {
         "easy": 251,
-        "medium": 598,
+        "medium": 777,
         "kyle": 1054
       }
     },
@@ -68,7 +68,7 @@
       "duration": 181.1,
       "counts": {
         "easy": 544,
-        "medium": 853,
+        "medium": 964,
         "kyle": 1002
       }
     },
@@ -80,7 +80,7 @@
       "duration": 167.7,
       "counts": {
         "easy": 405,
-        "medium": 725,
+        "medium": 883,
         "kyle": 1060
       }
     },
@@ -92,7 +92,7 @@
       "duration": 155.9,
       "counts": {
         "easy": 221,
-        "medium": 501,
+        "medium": 577,
         "kyle": 763
       }
     },
@@ -104,7 +104,7 @@
       "duration": 141.7,
       "counts": {
         "easy": 485,
-        "medium": 719,
+        "medium": 935,
         "kyle": 970
       }
     },
@@ -116,7 +116,7 @@
       "duration": 626.0,
       "counts": {
         "easy": 1191,
-        "medium": 2366,
+        "medium": 3106,
         "kyle": 3722
       }
     },
@@ -128,7 +128,7 @@
       "duration": 136.3,
       "counts": {
         "easy": 352,
-        "medium": 574,
+        "medium": 667,
         "kyle": 698
       }
     },
@@ -140,7 +140,7 @@
       "duration": 67.3,
       "counts": {
         "easy": 73,
-        "medium": 122,
+        "medium": 178,
         "kyle": 247
       }
     },
@@ -152,7 +152,7 @@
       "duration": 71.4,
       "counts": {
         "easy": 173,
-        "medium": 267,
+        "medium": 345,
         "kyle": 392
       }
     },
@@ -164,7 +164,7 @@
       "duration": 217.7,
       "counts": {
         "easy": 749,
-        "medium": 1207,
+        "medium": 1268,
         "kyle": 1298
       }
     },
@@ -176,7 +176,7 @@
       "duration": 174.4,
       "counts": {
         "easy": 619,
-        "medium": 1059,
+        "medium": 1338,
         "kyle": 1385
       }
     },
@@ -200,7 +200,7 @@
       "duration": 107.3,
       "counts": {
         "easy": 443,
-        "medium": 728,
+        "medium": 855,
         "kyle": 884
       }
     },
@@ -224,7 +224,7 @@
       "duration": 181.9,
       "counts": {
         "easy": 485,
-        "medium": 827,
+        "medium": 1037,
         "kyle": 1118
       }
     },
@@ -236,7 +236,7 @@
       "duration": 146.4,
       "counts": {
         "easy": 372,
-        "medium": 847,
+        "medium": 855,
         "kyle": 1068
       }
     },
@@ -248,8 +248,128 @@
       "duration": 215.5,
       "counts": {
         "easy": 637,
-        "medium": 1015,
+        "medium": 1292,
         "kyle": 1362
+      }
+    },
+    {
+      "id": "tvtime",
+      "title": "It's TV Time (Deltarune)",
+      "artist": "Lame Genie",
+      "bpm": 148.0,
+      "duration": 173.0,
+      "counts": {
+        "easy": 580,
+        "medium": 1324,
+        "kyle": 1422
+      }
+    },
+    {
+      "id": "thirdsanctuary",
+      "title": "Third Sanctuary (Deltarune)",
+      "artist": "Lame Genie",
+      "bpm": 170.000000008,
+      "duration": 233.8,
+      "counts": {
+        "easy": 627,
+        "medium": 1134,
+        "kyle": 1213
+      }
+    },
+    {
+      "id": "blackknife",
+      "title": "Black Knife (Deltarune)",
+      "artist": "Lame Genie",
+      "bpm": 147.5,
+      "duration": 151.5,
+      "counts": {
+        "easy": 508,
+        "medium": 1466,
+        "kyle": 1521
+      }
+    },
+    {
+      "id": "undefeatable",
+      "title": "Undefeatable (Sonic Frontiers)",
+      "artist": "Lame Genie",
+      "bpm": 200.0,
+      "duration": 265.8,
+      "counts": {
+        "easy": 1077,
+        "medium": 2070,
+        "kyle": 2173
+      }
+    },
+    {
+      "id": "battlingbreeze",
+      "title": "Battling Breeze (Expedition 33)",
+      "artist": "Lame Genie",
+      "bpm": 133.0,
+      "duration": 202.1,
+      "counts": {
+        "easy": 583,
+        "medium": 1337,
+        "kyle": 1413
+      }
+    },
+    {
+      "id": "oblivion",
+      "title": "Menu Theme (Oblivion)",
+      "artist": "Lame Genie",
+      "bpm": 175.0,
+      "duration": 104.6,
+      "counts": {
+        "easy": 374,
+        "medium": 807,
+        "kyle": 822
+      }
+    },
+    {
+      "id": "deadheatpulse",
+      "title": "Dead Heat Pulse (Ultrakill)",
+      "artist": "Lame Genie",
+      "bpm": 140.0,
+      "duration": 182.1,
+      "counts": {
+        "easy": 527,
+        "medium": 1345,
+        "kyle": 1638
+      }
+    },
+    {
+      "id": "themex",
+      "title": "Theme X (Xenoblade Chronicles X)",
+      "artist": "Lame Genie",
+      "bpm": 150.0,
+      "duration": 323.5,
+      "counts": {
+        "easy": 945,
+        "medium": 1778,
+        "kyle": 1862
+      }
+    },
+    {
+      "id": "ninjagaiden",
+      "title": "Act 4 Part 2 (Ninja Gaiden)",
+      "artist": "Lame Genie",
+      "bpm": 150.0,
+      "duration": 123.2,
+      "counts": {
+        "easy": 407,
+        "medium": 890,
+        "kyle": 945
+      }
+    },
+    {
+      "id": "arkveld1",
+      "title": "Arkveld Phase 1 (Monster Hunter Wilds)",
+      "artist": "Lame Genie",
+      "bpm": 132.0,
+      "duration": 229.8,
+      "counts": {
+        "easy": 578,
+        "medium": 1224,
+        "kyle": 1250
       }
     }
   ]

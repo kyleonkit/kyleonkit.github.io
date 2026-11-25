@@ -131,7 +131,25 @@
 
   // ───────── Loading a song ─────────
   let loadToken = 0;
+  // ───────── Back gesture → setlist ─────────
+  // Opening a song adds a history entry, so the phone's back swipe / back button
+  // returns to the setlist instead of leaving the game.
+  function pushPlay() { if (!(history.state && history.state.bk)) history.pushState({ bk: "play" }, ""); }
+  function leavePlay(fn) {
+    if (history.state && history.state.bk) { backTo = fn; history.back(); } else fn();
+  }
+  let backTo = null;
+  window.addEventListener("popstate", () => {
+    const fn = backTo; backTo = null;
+    if (fn) { fn(); return; }
+    // System back while playing/loading/settings: close whatever is open
+    $("settings").hidden = true;
+    if (!$("loading").hidden) { cancelLoad(); return; }
+    if (G || $("game").classList.contains("active")) { $("pause").hidden = true; quitNow(); }
+  });
+
   function loadSong(s) {
+    pushPlay();
     song = s;
     const token = ++loadToken;
     $("loading").hidden = false;
@@ -162,7 +180,8 @@
       $("loadHint").textContent = "Couldn't load this song. Check your connection and try again.";
     });
   }
-  $("cancelLoad").addEventListener("click", () => { loadToken++; $("loading").hidden = true; video.removeAttribute("src"); video.load(); });
+  function cancelLoad() { loadToken++; $("loading").hidden = true; video.removeAttribute("src"); video.load(); }
+  $("cancelLoad").addEventListener("click", () => leavePlay(cancelLoad));
   $("startBtn").addEventListener("click", () => {
     // Unlock audio playback inside the tap (iOS / Chrome autoplay rules)
     video.muted = /[?&]mute\b/.test(location.search); // ?mute: for testing without speakers
@@ -468,7 +487,8 @@
   });
   document.addEventListener("visibilitychange", () => { if (document.hidden) pause(); });
 
-  function quit() {
+  function quit() { leavePlay(quitNow); }
+  function quitNow() {
     exitFull();
     if (G) G.done = true;
     G = null;

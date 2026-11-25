@@ -264,12 +264,14 @@ def assign_tiers(notes, tempo):
       0 Easy   - quarter notes only (max 2 pads at once). An offbeat 8th is added
                  only where it "warrants" it: when nothing lands on that quarter
                  (pushes, syncopated accents).
-      1 Medium - everything on the 8th-note grid (max 3 pads at once).
+      1 Medium - everything on the 8th-note grid, plus 16th-note streams (4+ in a row),
+                 max 3 pads at once.
       2 Kyle   - every note."""
     lane_w = [2.0, 2.2, 1.4, 2.1]               # kick, snare, tom, crash
     TOL = 0.06                                   # quantise tolerance in quarter notes
     for nt in notes:
         beat = tempo.beat_at(nt["t"])
+        nt["_beat"] = beat
         nt["_q"] = math.floor(beat + TOL)        # which quarter note it belongs to
         frac = beat - nt["_q"]
         triplet = abs(frac - 1 / 3) < TOL or abs(frac - 2 / 3) < TOL
@@ -286,8 +288,18 @@ def assign_tiers(notes, tempo):
             for nt in chord[:k]:
                 nt["tier"] = min(nt["tier"], tier)
 
-    # Medium: 8th grid
-    cap([n for n in notes if n["_grid"] <= 8], 3, 1)
+    # Medium: 8th grid, plus 16th-note streams (4+ hits in a row exactly a 16th apart)
+    beats = sorted({round(n["_beat"], 3) for n in notes})
+    stream = set()
+    run = [beats[0]] if beats else []
+    for b in beats[1:] + [None]:
+        if b is not None and abs(b - run[-1] - 0.25) < TOL:
+            run.append(b)
+            continue
+        if len(run) >= 4:
+            stream.update(run)
+        run = [b] if b is not None else []
+    cap([n for n in notes if n["_grid"] <= 8 or round(n["_beat"], 3) in stream], 3, 1)
     # Easy: quarters, plus the offbeat 8th of any quarter that has nothing on the beat
     quarters = {}
     for nt in notes:
