@@ -479,6 +479,18 @@
         "medium": 473,
         "kyle": 658
       }
+    },
+    {
+      "id": "celestial",
+      "title": "Celestial Symphony (Black Myth: Wukong)",
+      "artist": "Lame Genie",
+      "bpm": 124.5,
+      "duration": 207.7,
+      "counts": {
+        "easy": 596,
+        "medium": 948,
+        "kyle": 1139
+      }
     }
   ]
 }
