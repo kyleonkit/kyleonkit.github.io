@@ -21,19 +21,19 @@ window.SITE = {
   socials: [
     { icon: "instagram", label: "Instagram", url: "https://www.instagram.com/kyleonkit" },
     { icon: "youtube",   label: "YouTube",   url: "https://www.youtube.com/@kyleonkitdrums" },
-    { icon: "tiktok",    label: "TikTok",    url: "https://www.tiktok.com/@kyleonkit" },
+    { icon: "tiktok",    label: "TikTok",    url: "https://www.tiktok.com/@kyleonkitdrums" },
   ],
 
   links: [
     { icon: "instagram", title: "Instagram", subtitle: "@kyleonkit", url: "https://www.instagram.com/kyleonkit", featured: true },
     { icon: "youtube",   title: "YouTube",   subtitle: "Gig vlogs & drum covers", url: "https://www.youtube.com/@kyleonkitdrums" },
-    { icon: "tiktok",    title: "TikTok",    subtitle: "@kyleonkit", url: "https://www.tiktok.com/@kyleonkit" },
+    { icon: "tiktok",    title: "TikTok",    subtitle: "@kyleonkitdrums", url: "https://www.tiktok.com/@kyleonkitdrums" },
 
     { heading: "Bands" },
 
     {
       group: "Lame Genie",
-      logo: "assets/band-lame-genie.png?v=20261124201417",
+      logo: "assets/band-lame-genie.png?v=20261124201722",
       logoStyle: "wide",
       subtitle: "Video game music covers",
       links: [
@@ -48,7 +48,7 @@ window.SITE = {
     },
     {
       group: "Run For Covers",
-      logo: "assets/band-run-for-covers.png?v=20261124201417",
+      logo: "assets/band-run-for-covers.png?v=20261124201722",
       logoStyle: "boxed",
       subtitle: "Your favorite cover band's favorite cover band",
       links: [
