@@ -41,4 +41,8 @@ Then `bash deploy.sh "Add <song>"`.
 
 Desktop (mouse + keyboard, window ≥ 900 px): plays full screen with the video behind the highway; keys shown under each lane (← ↓ ↑ → or A S D F; Space = kick, Enter = star power).
 
+Device sync: on first visit the game plays `game/sync/kick120.mp4` (kicks at 2.0 s + every 0.5 s, built by
+`tools/make_sync.py`) through the same video element as the songs; the median tap error becomes the audio delay.
+Re-run from Settings → "Sync this device again".
+
 Testing: `game/?debug&mute` exposes `window.__bk` and plays muted.

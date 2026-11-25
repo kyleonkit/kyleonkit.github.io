@@ -123,7 +123,7 @@
   delayEl.addEventListener("input", () => { settings.delay = +delayEl.value; showDelay(); saveSettings(); });
   $("noFail").addEventListener("change", (e) => { settings.noFail = e.target.checked; saveSettings(); });
   let settingsReturn = null;
-  $("openSettings").addEventListener("click", () => { settingsReturn = null; $("settings").hidden = false; });
+  $("openSettings").addEventListener("click", () => { settingsReturn = null; $("resync").hidden = false; $("settings").hidden = false; });
   $("closeSettings").addEventListener("click", () => {
     $("settings").hidden = true;
     if (settingsReturn) settingsReturn();
@@ -172,6 +172,96 @@
     enterFull();
     startRun();
   });
+
+  // ───────── Device sync ─────────
+  // Plays sync/kick120.mp4 (first kick at 2.0 s, then every 0.5 s) through the same <video>
+  // element as the songs, and times taps against it. The median error = this device's
+  // audio + touch latency, stored as settings.delay. Mandatory on first visit.
+  const SYNC = { first: 2.0, gap: 0.5, need: 16, skip: 2 };
+  const sync = { on: false, errs: [], done: null };
+  function openSync(done) {
+    sync.done = done || null;
+    sync.on = false;
+    $("syncDots").innerHTML = "<i></i>".repeat(SYNC.need);
+    $("syncResult").textContent = "";
+    $("syncPad").disabled = true;
+    $("syncStart").hidden = false;
+    $("syncDone").hidden = $("syncRedo").hidden = true;
+    $("sync").hidden = false;
+  }
+  function startSync() {
+    song = null;                                   // force the next song to reload its video
+    video.muted = /[?&]mute/.test(location.search);
+    video.src = "sync/kick120.mp4";
+    video.currentTime = 0;
+    video.play().catch(() => { $("syncResult").textContent = "Couldn't start audio. Tap Start again."; $("syncStart").hidden = false; });
+    sync.errs = [];
+    sync.on = true;
+    $("syncDots").innerHTML = "<i></i>".repeat(SYNC.need);
+    $("syncResult").textContent = "Listen… tap on every kick";
+    $("syncPad").disabled = false;
+    $("syncStart").hidden = $("syncDone").hidden = $("syncRedo").hidden = true;
+  }
+  function syncTap(stamp) {
+    if (!sync.on) return;
+    const pad = $("syncPad");
+    pad.classList.add("hit");
+    setTimeout(() => pad.classList.remove("hit"), 90);
+    if (!clock.playing) return;
+    const now = performance.now();
+    const t = videoTime(stamp && stamp <= now && now - stamp < 200 ? stamp : now);
+    const k = Math.round((t - SYNC.first) / SYNC.gap);
+    if (k < SYNC.skip) return;                     // let them lock in first
+    const err = t - (SYNC.first + k * SYNC.gap);
+    if (Math.abs(err) > SYNC.gap * 0.45) return;
+    sync.errs.push(err);
+    const dots = $("syncDots").children;
+    for (let i = 0; i < dots.length; i++) dots[i].classList.toggle("on", i < sync.errs.length);
+    if (sync.errs.length >= SYNC.need) finishSync();
+  }
+  function finishSync() {
+    sync.on = false;
+    video.pause();
+    $("syncPad").disabled = true;
+    const e = sync.errs.slice().sort((a, b) => a - b);
+    if (e.length < 10) {
+      $("syncResult").textContent = "Not enough taps. Let's try that again.";
+      $("syncRedo").hidden = false;
+      return;
+    }
+    const med = e[e.length >> 1];
+    const good = e.filter((x) => Math.abs(x - med) < 0.08);
+    const mean = good.reduce((a, b) => a + b, 0) / good.length;
+    const sd = Math.sqrt(good.reduce((a, b) => a + (b - mean) ** 2, 0) / good.length);
+    const ms = Math.max(-400, Math.min(400, Math.round((mean * 1000) / 5) * 5));
+    sync.result = ms;
+    $("syncResult").textContent = `Your device: ${ms > 0 ? "+" : ""}${ms} ms` +
+      (good.length < 10 || sd > 0.045 ? " · taps were uneven, Redo for a better reading" : " ✓");
+    $("syncDone").hidden = $("syncRedo").hidden = false;
+  }
+  $("syncStart").addEventListener("click", startSync);
+  $("syncRedo").addEventListener("click", startSync);
+  $("syncDone").addEventListener("click", () => {
+    settings.delay = sync.result;
+    settings.synced = true;
+    saveSettings();
+    delayEl.value = settings.delay;
+    showDelay();
+    $("sync").hidden = true;
+    const d = sync.done; sync.done = null;
+    if (d) d();
+  });
+  $("syncPad").addEventListener("pointerdown", (e) => { e.preventDefault(); syncTap(e.timeStamp); }, { passive: false });
+  window.addEventListener("keydown", (e) => {
+    if (!sync.on || e.repeat) return;
+    if (KEYMAP[e.code] !== undefined || e.code === "Enter") { e.preventDefault(); syncTap(e.timeStamp); }
+  });
+  video.addEventListener("ended", () => { if (sync.on) finishSync(); });
+  $("resync").addEventListener("click", () => {
+    $("settings").hidden = true;
+    openSync(() => { $("settings").hidden = false; });
+  });
+  if (!settings.synced) openSync();
 
   // ───────── Run state ─────────
   function buildRun() {
@@ -230,19 +320,14 @@
   video.addEventListener("ended", () => { if (G && !G.done) finish(false); });
 
   function videoTime(now) {
-    if (!clock.playing) return video.currentTime;
+    // The video's own clock plus the time since it last ticked. No smoothing state that
+    // could carry an offset; identical during device sync and songs, so sync carries over.
     const vt = video.currentTime;
-    const est = clock.v + (now - clock.p) / 1000;
-    if (vt !== clock.last) {
-      clock.last = vt;
-      clock.lastChange = now;
-      if (Math.abs(est - vt) > 0.05) { clock.v = vt; clock.p = now; return vt; }
-    } else if (now - clock.lastChange > 400) {
-      // Video isn't actually advancing (stalled): hold the notes where the video is
-      clock.v = vt; clock.p = now;
-      return vt;
-    }
-    return est;
+    if (vt !== clock.last) { clock.last = vt; clock.lastChange = now; }
+    if (!clock.playing) return vt;
+    const since = now - clock.lastChange;
+    if (since > 400) return vt;                      // stalled: hold the notes where the video is
+    return vt + Math.max(0, since) / 1000;
   }
   function gameTime(now) {
     if (!G) return 0;
@@ -376,6 +461,7 @@
   $("restart").addEventListener("click", () => { $("pause").hidden = true; video.pause(); startRun(); });
   $("quit").addEventListener("click", () => { $("pause").hidden = true; quit(); });
   $("pauseSettings").addEventListener("click", () => {
+    $("resync").hidden = true;      // sync swaps the video, so only from the setlist
     $("pause").hidden = true;
     $("settings").hidden = false;
     settingsReturn = () => { $("pause").hidden = false; };
@@ -463,7 +549,9 @@
     const labelH = (KEYS ? 56 : 26) * DPR;
     const yStrike = H - labelH - 34 * DPR;
     const yTop = H * 0.04;
-    const wNear = W * 0.96;
+    // Desktop: the stage sits over the video, so the whole highway (it widens ~17% below
+    // the strike line) must fit inside it. Phones keep full-width lanes for fingers.
+    const wNear = W * (DESK ? 0.8 : 0.96);
     const yV = (yTop - yStrike * S_FAR) / (1 - S_FAR);
     return { yStrike, yTop, wNear, yV, cx: W / 2, labelH };
   }
@@ -966,7 +1054,7 @@
 
   // Debug hook for testing: game/?debug
   if (/[?&]debug\b/.test(location.search)) {
-    window.__bk = { get G() { return G; }, hitLane, gameTime, video, settings };
+    window.__bk = { get G() { return G; }, hitLane, gameTime, video, settings, sync, videoTime };
   }
 
   function roundRect(x, y, w, h, r) {

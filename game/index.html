@@ -8,11 +8,11 @@
   <meta name="theme-color" content="#000000">
   <meta property="og:title" content="Be Kyle">
   <meta property="og:description" content="Tap along to Kyle on Kit's drum parts.">
-  <link rel="icon" type="image/png" href="../assets/favicon.png?v=20261125145859">
+  <link rel="icon" type="image/png" href="../assets/favicon.png?v=20261125150620">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,700;0,900;1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="game.css?v=20261125145859">
+  <link rel="stylesheet" href="game.css?v=20261125150620">
 </head>
 <body>
   <!-- ───────── Song select ───────── -->
@@ -60,8 +60,9 @@
       <p class="hint" id="diffHint"></p>
 
       <label class="row-label" for="delay">Audio delay <span id="delayVal">0 ms</span></label>
-      <input type="range" id="delay" min="-300" max="300" step="5" value="0">
-      <p class="hint">If notes feel early or late (e.g. on Bluetooth headphones), slide this until hits line up with the music.</p>
+      <input type="range" id="delay" min="-400" max="400" step="5" value="0">
+      <p class="hint">Set by Sync. If notes still feel early or late, nudge it here, or run Sync again (e.g. after switching to Bluetooth headphones).</p>
+      <button class="btn" id="resync">Sync this device again</button>
 
       <label class="toggle"><input type="checkbox" id="noFail"> <span>No Fail</span></label>
       <p class="hint">Keep playing even if the rock meter runs out.</p>
@@ -97,6 +98,19 @@
     </div>
   </div>
 
+  <div class="overlay" id="sync" hidden>
+    <div class="panel sync">
+      <h2>Sync your device</h2>
+      <p class="hint" id="syncHint">Every phone and speaker has a small audio delay. Turn your sound on (use the speaker or headphones you'll play with), press Start, then tap the pad on every kick.</p>
+      <button class="sync-pad" id="syncPad" disabled>TAP</button>
+      <div class="sync-dots" id="syncDots"></div>
+      <p class="sync-result" id="syncResult"></p>
+      <button class="btn primary" id="syncStart">Start</button>
+      <button class="btn primary" id="syncDone" hidden>Let's Rock</button>
+      <button class="btn" id="syncRedo" hidden>Redo</button>
+    </div>
+  </div>
+
   <div class="overlay" id="loading" hidden>
     <div class="panel menu">
       <div class="spinner"></div>
@@ -107,6 +121,6 @@
     </div>
   </div>
 
-  <script src="game.js?v=20261125145859"></script>
+  <script src="game.js?v=20261125150620"></script>
 </body>
 </html>
