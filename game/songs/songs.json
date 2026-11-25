@@ -85,6 +85,30 @@
       }
     },
     {
+      "id": "arc2",
+      "title": "II (ARC Raiders)",
+      "artist": "Lame Genie",
+      "bpm": 73.0,
+      "duration": 155.9,
+      "counts": {
+        "easy": 221,
+        "medium": 501,
+        "kyle": 763
+      }
+    },
+    {
+      "id": "fnaf2",
+      "title": "Main Theme (FNAF 2)",
+      "artist": "Lame Genie",
+      "bpm": 150.0,
+      "duration": 141.7,
+      "counts": {
+        "easy": 485,
+        "medium": 719,
+        "kyle": 970
+      }
+    },
+    {
       "id": "unevie",
       "title": "Une Vie \u00e0 Peindre (Expedition 33)",
       "artist": "Lame Genie",
@@ -94,6 +118,30 @@
         "easy": 1191,
         "medium": 2366,
         "kyle": 3722
+      }
+    },
+    {
+      "id": "teamup",
+      "title": "Team Up (ARC Raiders)",
+      "artist": "Lame Genie",
+      "bpm": 151.0,
+      "duration": 136.3,
+      "counts": {
+        "easy": 352,
+        "medium": 574,
+        "kyle": 698
+      }
+    },
+    {
+      "id": "strangerthings",
+      "title": "Main Theme (Stranger Things)",
+      "artist": "Lame Genie",
+      "bpm": 84.0,
+      "duration": 67.3,
+      "counts": {
+        "easy": 73,
+        "medium": 122,
+        "kyle": 247
       }
     },
     {
@@ -130,6 +178,78 @@
         "easy": 619,
         "medium": 1059,
         "kyle": 1385
+      }
+    },
+    {
+      "id": "incisive",
+      "title": "Incisive Battle (Silksong)",
+      "artist": "Lame Genie",
+      "bpm": 320.0,
+      "duration": 133.3,
+      "counts": {
+        "easy": 767,
+        "medium": 1090,
+        "kyle": 1097
+      }
+    },
+    {
+      "id": "strive",
+      "title": "Strive (Silksong)",
+      "artist": "Lame Genie",
+      "bpm": 192.0,
+      "duration": 107.3,
+      "counts": {
+        "easy": 443,
+        "medium": 728,
+        "kyle": 884
+      }
+    },
+    {
+      "id": "raiseupyourbat",
+      "title": "Raise Up Your Bat (Deltarune)",
+      "artist": "Lame Genie",
+      "bpm": 115.0,
+      "duration": 138.0,
+      "counts": {
+        "easy": 300,
+        "medium": 585,
+        "kyle": 757
+      }
+    },
+    {
+      "id": "hammer",
+      "title": "Hammer of Justice (Deltarune)",
+      "artist": "Lame Genie",
+      "bpm": 160.0,
+      "duration": 181.9,
+      "counts": {
+        "easy": 485,
+        "medium": 827,
+        "kyle": 1118
+      }
+    },
+    {
+      "id": "darkzone",
+      "title": "A Dark Zone (Deltarune)",
+      "artist": "Lame Genie",
+      "bpm": 149.999999992,
+      "duration": 146.4,
+      "counts": {
+        "easy": 372,
+        "medium": 847,
+        "kyle": 1068
+      }
+    },
+    {
+      "id": "guardian",
+      "title": "Guardian (Deltarune)",
+      "artist": "Lame Genie",
+      "bpm": 140.0,
+      "duration": 215.5,
+      "counts": {
+        "easy": 637,
+        "medium": 1015,
+        "kyle": 1362
       }
     }
   ]

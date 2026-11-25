@@ -12,7 +12,7 @@ What it does
   3. Finds where the video starts on the project timeline by matching the kick MIDI
      against the low end (30-120 Hz) of the video's audio (or use --offset SECONDS).
   4. Assigns each note a difficulty tier: 0 = Easy (~50%), 1 = Medium (~75%), 2 = Kyle (all).
-  5. Writes game/songs/<id>/chart.json, video.mp4 (540p, web-optimised), cover.jpg,
+  5. Writes game/songs/<id>/chart.json, video.mp4 (360p30, ~4 MB/min), cover.jpg,
      and adds/updates the song in game/songs/songs.json.
 
 Use --skip-video to rebuild only the chart.
@@ -383,11 +383,11 @@ def main():
 
     if not a.skip_video:
         mp4 = os.path.join(out, "video.mp4")
-        print("encoding 540p video (a few minutes)...")
+        print("encoding 360p video (a few minutes)...")
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", a.video,
-                        "-vf", "scale=-2:540", "-c:v", "libx264", "-preset", "slow", "-crf", "28",
-                        "-maxrate", "1200k", "-bufsize", "2400k", "-pix_fmt", "yuv420p",
-                        "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", mp4], check=True)
+                        "-vf", "scale=-2:360,fps=30", "-c:v", "libx264", "-preset", "slower", "-crf", "32",
+                        "-maxrate", "420k", "-bufsize", "840k", "-pix_fmt", "yuv420p",
+                        "-c:a", "aac", "-b:a", "96k", "-ac", "2", "-movflags", "+faststart", mp4], check=True)
         print(f"  video.mp4 {os.path.getsize(mp4) / 1e6:.1f} MB")
         at = a.cover_at if a.cover_at is not None else min(30, dur / 3)
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(at), "-i", a.video, "-frames:v", "1",
@@ -400,7 +400,7 @@ def main():
              "duration": round(dur, 1), "counts": chart["counts"]}
     ids = [s["id"] for s in lst["songs"]]
     if a.id in ids:
-        lst["songs"][ids.index(a.id)] = entry          # keep its place in the setlist
+        lst["songs"][ids.index(a.id)] = entry
     else:
         lst["songs"].append(entry)
     with open(lst_path, "w") as f:
@@ -415,6 +415,14 @@ def main():
                             f'--rpp "{a.rpp}" --track {a.track} --video "{a.video}"'}
     with open(src_path, "w") as f:
         json.dump(src, f, indent=2)
+
+    # Setlist order: newest video first
+    def vtime(sid):
+        v = src.get(sid, {}).get("video")
+        return os.path.getmtime(v) if v and os.path.exists(v) else 0
+    lst["songs"].sort(key=lambda e: -vtime(e["id"]))
+    with open(lst_path, "w") as f:
+        json.dump(lst, f, indent=2)
 
 
 if __name__ == "__main__":
