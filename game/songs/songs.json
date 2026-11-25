@@ -7,9 +7,9 @@
       "bpm": 160.0,
       "duration": 213.7,
       "counts": {
-        "easy": 673,
-        "medium": 1402,
-        "kyle": 1645
+        "easy": 667,
+        "medium": 1111,
+        "kyle": 1604
       }
     },
     {
@@ -20,7 +20,7 @@
       "duration": 135.2,
       "counts": {
         "easy": 314,
-        "medium": 450,
+        "medium": 424,
         "kyle": 460
       }
     },
@@ -32,8 +32,8 @@
       "duration": 138.4,
       "counts": {
         "easy": 329,
-        "medium": 631,
-        "kyle": 659
+        "medium": 628,
+        "kyle": 656
       }
     },
     {
@@ -44,8 +44,8 @@
       "duration": 141.7,
       "counts": {
         "easy": 318,
-        "medium": 553,
-        "kyle": 655
+        "medium": 480,
+        "kyle": 651
       }
     },
     {
@@ -56,8 +56,8 @@
       "duration": 137.8,
       "counts": {
         "easy": 251,
-        "medium": 777,
-        "kyle": 1054
+        "medium": 578,
+        "kyle": 1034
       }
     },
     {
@@ -68,8 +68,8 @@
       "duration": 181.1,
       "counts": {
         "easy": 544,
-        "medium": 964,
-        "kyle": 1002
+        "medium": 850,
+        "kyle": 999
       }
     },
     {
@@ -80,7 +80,7 @@
       "duration": 167.7,
       "counts": {
         "easy": 405,
-        "medium": 883,
+        "medium": 725,
         "kyle": 1060
       }
     },
@@ -92,8 +92,8 @@
       "duration": 155.9,
       "counts": {
         "easy": 221,
-        "medium": 577,
-        "kyle": 763
+        "medium": 476,
+        "kyle": 738
       }
     },
     {
@@ -104,8 +104,8 @@
       "duration": 141.7,
       "counts": {
         "easy": 485,
-        "medium": 935,
-        "kyle": 970
+        "medium": 701,
+        "kyle": 952
       }
     },
     {
@@ -116,8 +116,8 @@
       "duration": 626.0,
       "counts": {
         "easy": 1191,
-        "medium": 3106,
-        "kyle": 3722
+        "medium": 2329,
+        "kyle": 3684
       }
     },
     {
@@ -128,8 +128,8 @@
       "duration": 136.3,
       "counts": {
         "easy": 352,
-        "medium": 667,
-        "kyle": 698
+        "medium": 557,
+        "kyle": 681
       }
     },
     {
@@ -140,7 +140,7 @@
       "duration": 67.3,
       "counts": {
         "easy": 73,
-        "medium": 178,
+        "medium": 122,
         "kyle": 247
       }
     },
@@ -152,8 +152,8 @@
       "duration": 71.4,
       "counts": {
         "easy": 173,
-        "medium": 345,
-        "kyle": 392
+        "medium": 260,
+        "kyle": 383
       }
     },
     {
@@ -164,8 +164,8 @@
       "duration": 217.7,
       "counts": {
         "easy": 749,
-        "medium": 1268,
-        "kyle": 1298
+        "medium": 1199,
+        "kyle": 1290
       }
     },
     {
@@ -176,8 +176,8 @@
       "duration": 174.4,
       "counts": {
         "easy": 619,
-        "medium": 1338,
-        "kyle": 1385
+        "medium": 1032,
+        "kyle": 1358
       }
     },
     {
@@ -188,8 +188,8 @@
       "duration": 133.3,
       "counts": {
         "easy": 767,
-        "medium": 1090,
-        "kyle": 1097
+        "medium": 1057,
+        "kyle": 1064
       }
     },
     {
@@ -199,9 +199,9 @@
       "bpm": 192.0,
       "duration": 107.3,
       "counts": {
-        "easy": 443,
-        "medium": 855,
-        "kyle": 884
+        "easy": 441,
+        "medium": 716,
+        "kyle": 870
       }
     },
     {
@@ -212,8 +212,8 @@
       "duration": 138.0,
       "counts": {
         "easy": 300,
-        "medium": 585,
-        "kyle": 757
+        "medium": 566,
+        "kyle": 738
       }
     },
     {
@@ -223,9 +223,9 @@
       "bpm": 160.0,
       "duration": 181.9,
       "counts": {
-        "easy": 485,
-        "medium": 1037,
-        "kyle": 1118
+        "easy": 483,
+        "medium": 781,
+        "kyle": 1072
       }
     },
     {
@@ -236,8 +236,8 @@
       "duration": 146.4,
       "counts": {
         "easy": 372,
-        "medium": 855,
-        "kyle": 1068
+        "medium": 811,
+        "kyle": 1032
       }
     },
     {
@@ -248,8 +248,8 @@
       "duration": 215.5,
       "counts": {
         "easy": 637,
-        "medium": 1292,
-        "kyle": 1362
+        "medium": 978,
+        "kyle": 1325
       }
     },
     {
@@ -260,8 +260,8 @@
       "duration": 173.0,
       "counts": {
         "easy": 580,
-        "medium": 1324,
-        "kyle": 1422
+        "medium": 989,
+        "kyle": 1388
       }
     },
     {
@@ -272,8 +272,8 @@
       "duration": 233.8,
       "counts": {
         "easy": 627,
-        "medium": 1134,
-        "kyle": 1213
+        "medium": 1048,
+        "kyle": 1203
       }
     },
     {
@@ -284,8 +284,8 @@
       "duration": 151.5,
       "counts": {
         "easy": 508,
-        "medium": 1466,
-        "kyle": 1521
+        "medium": 962,
+        "kyle": 1485
       }
     },
     {
@@ -296,8 +296,8 @@
       "duration": 265.8,
       "counts": {
         "easy": 1077,
-        "medium": 2070,
-        "kyle": 2173
+        "medium": 1754,
+        "kyle": 2145
       }
     },
     {
@@ -307,9 +307,9 @@
       "bpm": 133.0,
       "duration": 202.1,
       "counts": {
-        "easy": 583,
-        "medium": 1337,
-        "kyle": 1413
+        "easy": 577,
+        "medium": 957,
+        "kyle": 1392
       }
     },
     {
@@ -319,9 +319,9 @@
       "bpm": 175.0,
       "duration": 104.6,
       "counts": {
-        "easy": 374,
-        "medium": 807,
-        "kyle": 822
+        "easy": 370,
+        "medium": 599,
+        "kyle": 800
       }
     },
     {
@@ -332,8 +332,8 @@
       "duration": 182.1,
       "counts": {
         "easy": 527,
-        "medium": 1345,
-        "kyle": 1638
+        "medium": 1010,
+        "kyle": 1606
       }
     },
     {
@@ -344,8 +344,8 @@
       "duration": 323.5,
       "counts": {
         "easy": 945,
-        "medium": 1778,
-        "kyle": 1862
+        "medium": 1437,
+        "kyle": 1847
       }
     },
     {
@@ -356,8 +356,8 @@
       "duration": 123.2,
       "counts": {
         "easy": 407,
-        "medium": 890,
-        "kyle": 945
+        "medium": 623,
+        "kyle": 918
       }
     },
     {
@@ -368,8 +368,116 @@
       "duration": 229.8,
       "counts": {
         "easy": 578,
-        "medium": 1224,
-        "kyle": 1250
+        "medium": 970,
+        "kyle": 1229
+      }
+    },
+    {
+      "id": "waterfall",
+      "title": "Waterfall (Contra)",
+      "artist": "Lame Genie",
+      "bpm": 150.0,
+      "duration": 103.1,
+      "counts": {
+        "easy": 341,
+        "medium": 553,
+        "kyle": 898
+      }
+    },
+    {
+      "id": "bases",
+      "title": "Bases (Contra)",
+      "artist": "Lame Genie",
+      "bpm": 150.0,
+      "duration": 99.6,
+      "counts": {
+        "easy": 327,
+        "medium": 521,
+        "kyle": 655
+      }
+    },
+    {
+      "id": "marvellogin",
+      "title": "Login Theme (Marvel Rivals)",
+      "artist": "Lame Genie",
+      "bpm": 175.0,
+      "duration": 203.3,
+      "counts": {
+        "easy": 590,
+        "medium": 916,
+        "kyle": 1115
+      }
+    },
+    {
+      "id": "jungle",
+      "title": "Jungle (Contra)",
+      "artist": "Lame Genie",
+      "bpm": 153.0,
+      "duration": 103.7,
+      "counts": {
+        "easy": 337,
+        "medium": 511,
+        "kyle": 832
+      }
+    },
+    {
+      "id": "smwcastle",
+      "title": "Castle Theme (Super Mario World)",
+      "artist": "Lame Genie",
+      "bpm": 205.0,
+      "duration": 167.2,
+      "counts": {
+        "easy": 574,
+        "medium": 948,
+        "kyle": 1434
+      }
+    },
+    {
+      "id": "airarmada",
+      "title": "Air Armada (Rivals of Aether II)",
+      "artist": "Lame Genie",
+      "bpm": 180.0,
+      "duration": 138.1,
+      "counts": {
+        "easy": 346,
+        "medium": 542,
+        "kyle": 587
+      }
+    },
+    {
+      "id": "shadowgen",
+      "title": "Title Theme (Sonic X Shadow Generations)",
+      "artist": "Lame Genie",
+      "bpm": 95.0,
+      "duration": 109.7,
+      "counts": {
+        "easy": 197,
+        "medium": 296,
+        "kyle": 560
+      }
+    },
+    {
+      "id": "yaoguai",
+      "title": "The Greatest Yaoguai (Black Myth: Wukong)",
+      "artist": "Lame Genie",
+      "bpm": 147.0,
+      "duration": 305.6,
+      "counts": {
+        "easy": 998,
+        "medium": 1651,
+        "kyle": 1977
+      }
+    },
+    {
+      "id": "terrifier",
+      "title": "Main Theme (Terrifier)",
+      "artist": "Lame Genie",
+      "bpm": 120.0,
+      "duration": 103.5,
+      "counts": {
+        "easy": 285,
+        "medium": 473,
+        "kyle": 658
       }
     }
   ]

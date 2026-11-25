@@ -258,14 +258,38 @@ def find_offset(video, kicks, lo=-30.0, hi=30.0):
     return round(g0 + 0.032, 4), (agree / total if total else 0.0)
 
 
+# ── Two thumbs: never more than 2 notes at once ──────────────────────────
+CHORD_PRIORITY = [2.0, 2.2, 1.4, 2.1]   # kick, snare, tom, crash (+ velocity breaks ties)
+
+
+def two_at_once(notes, window=0.03):
+    """Group hits that land within `window` s of each other and keep the 2 most important.
+    Snare > crash > kick > tom, louder first."""
+    out, group = [], []
+    def flush():
+        group.sort(key=lambda n: -(CHORD_PRIORITY[n["lane"]] + n["vel"] / 127))
+        out.extend(group[:2])
+    for nt in notes:
+        if group and nt["t"] - group[0]["t"] > window:
+            flush(); group = []
+        group.append(nt)
+    if group:
+        flush()
+    dropped = len(notes) - len(out)
+    if dropped:
+        print(f"  two-thumb limit: dropped {dropped} notes from 3+ note chords")
+    return sorted(out, key=lambda n: (n["t"], n["lane"]))
+
+
 # ── Difficulty tiers ──────────────────────────────────────────────────────
 def assign_tiers(notes, tempo):
     """notes: list of dicts with t (project s), lane, vel. Adds 'tier' in place.
       0 Easy   - quarter notes only (max 2 pads at once). An offbeat 8th is added
                  only where it "warrants" it: when nothing lands on that quarter
                  (pushes, syncopated accents).
-      1 Medium - everything on the 8th-note grid, plus 16th-note streams (4+ in a row),
-                 max 3 pads at once.
+      1 Medium - everything on the 8th-note grid (straight or triplet 8ths).
+    Every tier, Kyle included, has at most 2 notes at once (playable with two thumbs);
+    see two_at_once().
       2 Kyle   - every note."""
     lane_w = [2.0, 2.2, 1.4, 2.1]               # kick, snare, tom, crash
     TOL = 0.06                                   # quantise tolerance in quarter notes
@@ -288,18 +312,8 @@ def assign_tiers(notes, tempo):
             for nt in chord[:k]:
                 nt["tier"] = min(nt["tier"], tier)
 
-    # Medium: 8th grid, plus 16th-note streams (4+ hits in a row exactly a 16th apart)
-    beats = sorted({round(n["_beat"], 3) for n in notes})
-    stream = set()
-    run = [beats[0]] if beats else []
-    for b in beats[1:] + [None]:
-        if b is not None and abs(b - run[-1] - 0.25) < TOL:
-            run.append(b)
-            continue
-        if len(run) >= 4:
-            stream.update(run)
-        run = [b] if b is not None else []
-    cap([n for n in notes if n["_grid"] <= 8 or round(n["_beat"], 3) in stream], 3, 1)
+    # Medium: 8th grid only (straight or triplet 8ths)
+    cap([n for n in notes if n["_grid"] <= 8], 2, 1)
     # Easy: quarters, plus the offbeat 8th of any quarter that has nothing on the beat
     quarters = {}
     for nt in notes:
@@ -354,6 +368,7 @@ def main():
             continue
         merged.append(nt)
     notes = sorted(merged, key=lambda n: (n["t"], n["lane"]))
+    notes = two_at_once(notes)
     assign_tiers(notes, tempo)
 
     if a.offset is None:

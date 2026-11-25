@@ -33,8 +33,8 @@ RACK + FLOOR → Tom (one lane), CRASH L/R/R2 → Cymbal). Hats, ride, bell, chi
 "grab" chokes are deliberately not charted. Without note names it falls back to the GGD numbers.
 Sync: lines the kick MIDI up with the 30–120 Hz band of the video's audio and prints the offset plus
 how many 20 s windows agree (want 80%+; pass `--offset` to override). Notes after the video ends are dropped.
-Tiers: Easy = quarter notes (an offbeat 8th only where nothing hits on that quarter; max 2 pads),
-Medium = the 8th / triplet-8th grid plus 16th streams of 4+ (max 3 pads), Kyle = everything.
+Tiers: Every tier (Kyle too) has at most 2 notes at once (two thumbs). Easy = quarter notes (an offbeat 8th only where nothing hits on that quarter),
+Medium = the 8th / triplet-8th grid only, Kyle = everything.
 It also encodes the video (360p30, ≤420 kbps + 96k audio ≈ 4 MB/min; the whole Pages site must stay under 1 GB) and updates `songs.json`.
 Where each song came from is saved locally (not published) in `tools/song-sources.local.json`.
 Then `bash deploy.sh "Add <song>"`.

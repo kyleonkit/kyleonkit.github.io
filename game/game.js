@@ -7,10 +7,10 @@
 
   // ───────── Constants ─────────
   const LANES = [
-    { name: "KICK",   key: "← A", color: "#22c33a", dark: "#0b5c16", light: "#9cff9c" },
-    { name: "SNARE",  key: "↓ S", color: "#e8262b", dark: "#6b0a0c", light: "#ff9c9c" },
-    { name: "TOM",    key: "↑ D", color: "#f5d20d", dark: "#7a6400", light: "#fff3a0" },
-    { name: "CYMBAL", key: "→ F", color: "#ff8a12", dark: "#7a3a00", light: "#ffd09c" },
+    { name: "KICK",   pad: "◀ X", key: "← A", color: "#22c33a", dark: "#0b5c16", light: "#9cff9c" },
+    { name: "SNARE",  pad: "▼ A", key: "↓ S", color: "#e8262b", dark: "#6b0a0c", light: "#ff9c9c" },
+    { name: "TOM",    pad: "▲ Y", key: "↑ D", color: "#f5d20d", dark: "#7a6400", light: "#fff3a0" },
+    { name: "CYMBAL", pad: "▶ B", key: "→ F", color: "#ff8a12", dark: "#7a3a00", light: "#ffd09c" },
   ];
   const NL = LANES.length;
   // Desktop (mouse + keyboard): show keycaps; on wide windows go full screen with the video behind the highway
@@ -175,6 +175,7 @@
       document.querySelector("#loading .spinner").classList.add("done");
       $("loadHint").textContent = `${DIFFS[settings.diff].label} · ${c.counts[settings.diff]} notes`;
       $("startBtn").hidden = false;
+      if (PAD.on) $("startBtn").focus();
     }).catch(() => {
       if (token !== loadToken) return;
       $("loadHint").textContent = "Couldn't load this song. Check your connection and try again.";
@@ -186,7 +187,16 @@
     // Unlock audio playback inside the tap (iOS / Chrome autoplay rules)
     video.muted = /[?&]mute\b/.test(location.search); // ?mute: for testing without speakers
     const p = video.play();
-    if (p && p.then) p.then(() => { if (!G || G.phase === "lead") { video.pause(); video.currentTime = 0; } }).catch(() => {});
+    if (p && p.then) p.then(() => { if (!G || G.phase === "lead") { video.pause(); video.currentTime = 0; } }).catch((e) => {
+      // Browsers only allow sound after a tap/click/key press (a controller button doesn't count)
+      if (!e || e.name !== "NotAllowedError") return;
+      if (G) G.done = true;
+      G = null;
+      $("game").classList.remove("active");
+      $("select").classList.add("active");
+      $("loading").hidden = false;
+      $("loadHint").textContent = "Your browser needs one tap, click or key press to turn the sound on. Then press Tap to Rock.";
+    });
     $("loading").hidden = true;
     enterFull();
     startRun();
@@ -281,6 +291,132 @@
     openSync(() => { $("settings").hidden = false; });
   });
   if (!settings.synced) openSync();
+
+  // ───────── Game controllers (Gamepad API, "standard" mapping) ─────────
+  // Lanes mirror the arrow keys by position: D-pad ◀▼▲▶ and the face buttons
+  // left/bottom/top/right (Xbox X A Y B, PlayStation □ ✕ △ ○). LB/LT = kick,
+  // RB/RT = cymbal, Back/Select (or a stick click) = star power, Start = pause.
+  // Menus: D-pad moves focus, A selects, B goes back.
+  const PAD = { on: false, prev: [], timer: 0 };
+  const PAD_LANE = { 14: 0, 2: 0, 4: 0, 6: 0, 13: 1, 0: 1, 12: 2, 3: 2, 15: 3, 1: 3, 5: 3, 7: 3 };
+  function padPressed(b) { return typeof b === "object" ? b.pressed || b.value > 0.5 : b === 1; }
+  function visible(el) { return el.offsetParent !== null && !el.disabled; }
+  function menuButtons() {
+    const open = [...document.querySelectorAll(".overlay")].filter((o) => !o.hidden);
+    const root = open.length ? open[open.length - 1] : $("select");
+    return [...root.querySelectorAll("button, a.icon-btn, input")].filter(visible);
+  }
+  // Spatial navigation: pick the nearest focusable element in the pressed direction
+  function menuMove(dir) {
+    const list = menuButtons();
+    if (!list.length) return;
+    const cur = document.activeElement;
+    if (!list.includes(cur)) { focusEl(list[0]); return; }
+    // Sliders: left/right change the value
+    if (cur.type === "range" && (dir === "left" || dir === "right")) {
+      cur.value = +cur.value + (dir === "right" ? 1 : -1) * (+cur.step || 1) * 2;
+      cur.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
+    }
+    const a = cur.getBoundingClientRect();
+    const ax = a.left + a.width / 2, ay = a.top + a.height / 2;
+    // Nearest row (or column) in that direction first, then the closest item within it
+    const cands = [];
+    for (const el of list) {
+      if (el === cur) continue;
+      const b = el.getBoundingClientRect();
+      const bx = b.left + b.width / 2, by = b.top + b.height / 2;
+      const dx = bx - ax, dy = by - ay;
+      let main, cross;
+      if (dir === "up") { main = -dy; cross = dx; }
+      else if (dir === "down") { main = dy; cross = dx; }
+      else if (dir === "left") { main = -dx; cross = dy; }
+      else { main = dx; cross = dy; }
+      if (main > 4) cands.push({ el, main, cross: Math.abs(cross) });
+    }
+    if (!cands.length) return;
+    const near = Math.min(...cands.map((c) => c.main));
+    const row = cands.filter((c) => c.main <= near + 14);
+    row.sort((p, q) => p.cross - q.cross);
+    focusEl(row[0].el);
+  }
+  function focusEl(el) {
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  function menuBack() {
+    if (!$("settings").hidden) { $("closeSettings").click(); return; }
+    if (!$("pause").hidden) { $("resume").click(); return; }
+    if (!$("loading").hidden) { $("cancelLoad").click(); return; }
+    if (!$("results").hidden) { $("toSongs").click(); return; }
+  }
+  function padPoll() {
+    const pads = navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean) : [];
+    if (!pads.length) return;
+    const inGame = $("game").classList.contains("active") && G && !G.done && G.phase !== "paused";
+    pads.forEach((gp, gi) => {
+      const prev = PAD.prev[gi] || [];
+      const now = gp.buttons.map(padPressed);
+      // Controller's own input time, in the same clock as performance.now()
+      const stamp = gp.timestamp || performance.now();
+      now.forEach((down, b) => {
+        if (!down || prev[b]) return;
+        const lane = PAD_LANE[b];
+        if (sync.on) { if (lane !== undefined) syncTap(stamp); return; }
+        if (inGame) {
+          if (lane !== undefined) hitLane(lane, stamp);
+          else if (b === 8 || b === 10 || b === 11) activateSP();
+          else if (b === 9) togglePause();
+          return;
+        }
+        if ($("game").classList.contains("active") && G && G.phase === "paused" && b === 9) { togglePause(); return; }
+        // Menus
+        if (DIRS[b]) { menuMove(DIRS[b]); PAD.held = { dir: DIRS[b], at: performance.now() + 380 }; }
+        else if (b === 0) {
+          const el = document.activeElement;
+          if (el && el !== document.body && visible(el)) el.click(); else menuMove("down");
+        } else if (b === 1) menuBack();
+      });
+      PAD.prev[gi] = now;
+      if (!inGame && !sync.on) menuHold(gp, now);
+    });
+    // When a menu or overlay opens, move focus into it (its main button first)
+    const t = performance.now();
+    if (!inGame && t - (PAD.fixAt || 0) > 150) {
+      PAD.fixAt = t;
+      const list = menuButtons();
+      if (list.length && !list.includes(document.activeElement)) {
+        const top = !$("settings").hidden;           // Settings: start at the top, others: main button
+        focusEl((!top && list.find((el) => el.classList.contains("primary"))) || list.find((el) => el.classList.contains("song")) || list[0]);
+      }
+    }
+  }
+  const DIRS = { 12: "up", 13: "down", 14: "left", 15: "right" };
+  // Holding a direction (D-pad or left stick) repeats, so long setlists scroll quickly
+  function menuHold(gp, btns) {
+    const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0;
+    const stick = Math.abs(ay) > 0.6 ? (ay < 0 ? "up" : "down") : Math.abs(ax) > 0.6 ? (ax < 0 ? "left" : "right") : null;
+    const dpad = Object.keys(DIRS).find((k) => btns[k]);
+    const dir = dpad ? DIRS[dpad] : stick;
+    const t = performance.now();
+    if (!dir) { PAD.held = null; return; }
+    if (!PAD.held || PAD.held.dir !== dir) {
+      if (!dpad) menuMove(dir);                     // stick: move on first push (D-pad moved on press)
+      PAD.held = { dir, at: t + 380 };
+      return;
+    }
+    if (t >= PAD.held.at) { menuMove(dir); PAD.held.at = t + 110; }
+  }
+  window.addEventListener("gamepadconnected", () => {
+    PAD.on = true;
+    document.body.classList.add("pad");
+    if (!PAD.timer) PAD.timer = setInterval(padPoll, 4);    // 250 Hz for tight timing
+    if (!$("game").classList.contains("active")) menuMove("down");
+  });
+  window.addEventListener("gamepaddisconnected", () => {
+    const left = navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean).length : 0;
+    if (!left) { PAD.on = false; document.body.classList.remove("pad"); clearInterval(PAD.timer); PAD.timer = 0; PAD.prev = []; }
+  });
 
   // ───────── Run state ─────────
   function buildRun() {
@@ -566,14 +702,19 @@
   // Perspective: s = 1 at the strike line, S_FAR at the far end
   const S_FAR = 0.3;
   function geom() {
-    const labelH = (KEYS ? 56 : 26) * DPR;
-    const yStrike = H - labelH - 34 * DPR;
+    const caps = KEYS || PAD.on;               // show keycaps / controller buttons
+    const labelH = (caps ? 56 : 26) * DPR;
+    // Phones: lift the pads off the bottom edge (home bar / thumbs resting on the bezel).
+    // The space below still counts as part of each lane for taps.
+    const lift = KEYS ? 0 : Math.max(96 * DPR, H * 0.17);
+    const bottom = H - lift;
+    const yStrike = bottom - labelH - 34 * DPR;
     const yTop = H * 0.04;
     // Desktop: the stage sits over the video, so the whole highway (it widens ~17% below
     // the strike line) must fit inside it. Phones keep full-width lanes for fingers.
     const wNear = W * (DESK ? 0.8 : 0.96);
     const yV = (yTop - yStrike * S_FAR) / (1 - S_FAR);
-    return { yStrike, yTop, wNear, yV, cx: W / 2, labelH };
+    return { yStrike, yTop, wNear, yV, cx: W / 2, labelH, bottom };
   }
   // z: 0 = strike line, 1 = far end (can be <0 for notes that passed)
   const sAt = (z) => 1 / (1 + z * (1 / S_FAR - 1));
@@ -655,7 +796,7 @@
 
     // Highway body
     const sB = sAt(-0.06), sT = S_FAR;
-    const yB = Math.min(H - g.labelH, yAt(g, sB));
+    const yB = Math.min(g.bottom - g.labelH, yAt(g, sB));
     ctx.beginPath();
     ctx.moveTo(xAt(g, 0, sT), g.yTop);
     ctx.lineTo(xAt(g, NL, sT), g.yTop);
@@ -774,13 +915,13 @@
       const lit = G.pressed[l] && now - G.pressed[l] < 120;
       const x = xAt(g, l + 0.5, 1);
       ctx.fillStyle = lit ? LANES[l].light : "rgba(255,255,255,0.55)";
-      if (!KEYS) { ctx.fillText(LANES[l].name, x, H - g.labelH / 2 - 2 * DPR); continue; }
-      ctx.fillText(LANES[l].name, x, H - g.labelH + 10 * DPR);
+      if (!(KEYS || PAD.on)) { ctx.fillText(LANES[l].name, x, g.bottom - g.labelH / 2 - 2 * DPR); continue; }
+      ctx.fillText(LANES[l].name, x, g.bottom - g.labelH + 10 * DPR);
       // Keycap
-      const k = LANES[l].key.toUpperCase();
+      const k = PAD.on ? LANES[l].pad : LANES[l].key.toUpperCase();
       ctx.font = `900 ${12 * DPR}px Montserrat, sans-serif`;
       const kw = Math.max(26 * DPR, ctx.measureText(k).width + 16 * DPR), kh = 24 * DPR;
-      const ky = H - kh - 6 * DPR;
+      const ky = g.bottom - kh - 6 * DPR;
       roundRect(x - kw / 2, ky, kw, kh, 5 * DPR);
       ctx.fillStyle = lit ? LANES[l].color : "rgba(255,255,255,0.08)";
       ctx.fill();
