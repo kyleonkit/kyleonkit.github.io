@@ -46,6 +46,15 @@
     return a;
   }
 
+  // ↗ "opens a link" arrow, used on cards, stat tiles and chips
+  function arrowEl() {
+    const arrow = document.createElement("span");
+    arrow.className = "arrow";
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>';
+    return arrow;
+  }
+
   if (S.name) document.title = S.name;
   // Tagline: "a | b | c" → segments that only wrap at the dividers
   const tag = document.getElementById("tagline");
@@ -133,6 +142,7 @@
           const num = document.createElement("span");
           num.className = "stat-num";
           num.textContent = g.stat;
+          if (g.url) num.appendChild(arrowEl());
           const what = document.createElement("span");
           what.className = "stat-label";
           what.textContent = g.statLabel || "";
@@ -151,6 +161,7 @@
         const lab = document.createElement("span");
         lab.textContent = g.label;
         a.appendChild(lab);
+        if (g.url) a.appendChild(arrowEl());
         row.appendChild(a);
       });
       if (row.children.length) li.appendChild(row);
@@ -177,11 +188,7 @@
     }
     a.appendChild(text);
 
-    const arrow = document.createElement("span");
-    arrow.className = "arrow";
-    arrow.setAttribute("aria-hidden", "true");
-    arrow.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>';
-    a.appendChild(arrow);
+    a.appendChild(arrowEl());
 
     li.appendChild(a);
     list.appendChild(li);
