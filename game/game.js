@@ -7,12 +7,12 @@
 
   // ───────── Constants ─────────
   const LANES = [
-    { name: "KICK",   key: "Space", color: "#22c33a", dark: "#0b5c16", light: "#9cff9c" },
-    { name: "SNARE",  key: "D",     color: "#e8262b", dark: "#6b0a0c", light: "#ff9c9c" },
-    { name: "TOM 1",  key: "F",     color: "#f5d20d", dark: "#7a6400", light: "#fff3a0" },
-    { name: "TOM 2",  key: "J",     color: "#1f6ff2", dark: "#0a2f73", light: "#a8c8ff" },
-    { name: "CYMBAL", key: "K",     color: "#ff8a12", dark: "#7a3a00", light: "#ffd09c" },
+    { name: "KICK",   key: "← A", color: "#22c33a", dark: "#0b5c16", light: "#9cff9c" },
+    { name: "SNARE",  key: "↓ S", color: "#e8262b", dark: "#6b0a0c", light: "#ff9c9c" },
+    { name: "TOM",    key: "↑ D", color: "#f5d20d", dark: "#7a6400", light: "#fff3a0" },
+    { name: "CYMBAL", key: "→ F", color: "#ff8a12", dark: "#7a3a00", light: "#ffd09c" },
   ];
+  const NL = LANES.length;
   // Desktop (mouse + keyboard): show keycaps; on wide windows go full screen with the video behind the highway
   const KEYS = matchMedia("(hover: hover) and (pointer: fine)").matches;
   let DESK = false;
@@ -31,7 +31,7 @@
   }
   // Esc leaves full screen before the page sees the key: treat it as pause
   document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement) pause(); });
-  const KEYMAP = { Space: 0, KeyS: 0, KeyD: 1, KeyF: 2, KeyJ: 3, KeyK: 4, KeyL: 4 };
+  const KEYMAP = { ArrowLeft: 0, KeyA: 0, Space: 0, ArrowDown: 1, KeyS: 1, ArrowUp: 2, KeyD: 2, ArrowRight: 3, KeyF: 3 };
   const DIFFS = {
     easy:   { label: "Easy",   tier: 0, look: 1.9,  miss: 0.018, hint: "Quarter notes (a few 8ths where the groove needs them), slower highway." },
     medium: { label: "Medium", tier: 1, look: 1.6,  miss: 0.024, hint: "Everything on the 8th-note grid." },
@@ -254,7 +254,7 @@
   // ───────── Input ─────────
   function laneAtX(x) {
     const r = canvas.getBoundingClientRect();
-    return Math.max(0, Math.min(4, Math.floor(((x - r.left) / r.width) * 5)));
+    return Math.max(0, Math.min(NL - 1, Math.floor(((x - r.left) / r.width) * NL)));
   }
   canvas.addEventListener("pointerdown", (e) => {
     e.preventDefault();
@@ -470,7 +470,7 @@
   // z: 0 = strike line, 1 = far end (can be <0 for notes that passed)
   const sAt = (z) => 1 / (1 + z * (1 / S_FAR - 1));
   const yAt = (g, s) => g.yV + (g.yStrike - g.yV) * s;
-  const xAt = (g, laneEdge, s) => g.cx + (laneEdge / 5 - 0.5) * g.wNear * s; // laneEdge 0..5
+  const xAt = (g, laneEdge, s) => g.cx + (laneEdge / NL - 0.5) * g.wNear * s; // laneEdge 0..NL
 
   let raf = 0;
   function frame() {
@@ -491,7 +491,7 @@
 
   function update(t, now) {
     // Misses
-    for (let l = 0; l < 5; l++) {
+    for (let l = 0; l < NL; l++) {
       const list = G.byLane[l];
       let p = G.ptr[l];
       while (p < list.length && (list[p].hit || list[p].t < t - WINDOW)) {
@@ -550,8 +550,8 @@
     const yB = Math.min(H - g.labelH, yAt(g, sB));
     ctx.beginPath();
     ctx.moveTo(xAt(g, 0, sT), g.yTop);
-    ctx.lineTo(xAt(g, 5, sT), g.yTop);
-    ctx.lineTo(xAt(g, 5, sB), yB);
+    ctx.lineTo(xAt(g, NL, sT), g.yTop);
+    ctx.lineTo(xAt(g, NL, sB), yB);
     ctx.lineTo(xAt(g, 0, sB), yB);
     ctx.closePath();
     const hw = ctx.createLinearGradient(0, g.yTop, 0, g.yStrike);
@@ -573,11 +573,11 @@
       const s = sAt(z), y = yAt(g, s);
       ctx.beginPath();
       ctx.moveTo(xAt(g, 0, s), y);
-      ctx.lineTo(xAt(g, 5, s), y);
+      ctx.lineTo(xAt(g, NL, s), y);
       ctx.stroke();
     }
     // Lane dividers
-    for (let l = 1; l < 5; l++) {
+    for (let l = 1; l < NL; l++) {
       ctx.strokeStyle = "rgba(255,255,255,0.10)";
       ctx.lineWidth = 1.2 * DPR;
       ctx.beginPath();
@@ -595,7 +595,7 @@
       ctx.lineWidth = (b[1] ? 3 : 1.5) * DPR * s;
       ctx.beginPath();
       ctx.moveTo(xAt(g, 0, s), y);
-      ctx.lineTo(xAt(g, 5, s), y);
+      ctx.lineTo(xAt(g, NL, s), y);
       ctx.stroke();
     }
     // Fade the far end into the dark
@@ -613,7 +613,7 @@
     ctx.strokeStyle = railC;
     ctx.shadowColor = sp ? "#59e6ff" : danger ? "#ff0000" : "rgba(255,200,120,0.6)";
     ctx.shadowBlur = (sp || danger ? 18 : 8) * DPR;
-    for (const e of [0, 5]) {
+    for (const e of [0, NL]) {
       ctx.beginPath();
       ctx.moveTo(xAt(g, e, sT), g.yTop + (g.yStrike - g.yTop) * 0.08);
       ctx.lineTo(xAt(g, e, sB), yB);
@@ -626,12 +626,12 @@
     ctx.fillRect(xAt(g, 0, 1), g.yStrike - 3 * DPR, g.wNear, 6 * DPR);
 
     // Fret buttons (targets)
-    const laneW = g.wNear / 5;
-    for (let l = 0; l < 5; l++) drawFret(g, l, laneW, now);
+    const laneW = g.wNear / NL;
+    for (let l = 0; l < NL; l++) drawFret(g, l, laneW, now);
 
     // Notes: far → near
     const visible = [];
-    for (let l = 0; l < 5; l++) {
+    for (let l = 0; l < NL; l++) {
       const list = G.byLane[l];
       for (let i = Math.max(0, G.ptr[l] - 6); i < list.length; i++) {
         const n = list[i];
@@ -662,7 +662,7 @@
     ctx.font = `900 ${10.5 * DPR}px Montserrat, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    for (let l = 0; l < 5; l++) {
+    for (let l = 0; l < NL; l++) {
       const lit = G.pressed[l] && now - G.pressed[l] < 120;
       const x = xAt(g, l + 0.5, 1);
       ctx.fillStyle = lit ? LANES[l].light : "rgba(255,255,255,0.55)";
@@ -813,7 +813,7 @@
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
     // Flames: short upward fire from the fret
-    for (let l = 0; l < 5; l++) {
+    for (let l = 0; l < NL; l++) {
       const age = now - G.flames[l];
       if (age > 240) continue;
       const k = age / 240;

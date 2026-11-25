@@ -28,13 +28,13 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SONGS = os.path.join(ROOT, "game", "songs")
-LANES = ["kick", "snare", "tom1", "tom2", "cymbal"]
+LANES = ["kick", "snare", "tom", "cymbal"]
 
 # MIDI note -> lane index. Normally read from the drum track's note names
 # (REAPER <MIDINOTENAMES>, see lane_for_name); this GGD map is the fallback.
 # Cymbal lane = crash accents only. Hats, ride, bell, chinas, stack, splash
 # and "grab" chokes are left out on purpose (Kyle's call, 2026-11-25).
-DEFAULT_MAP = {24: 0, 26: 1, 35: 2, 36: 3, 52: 4, 54: 4, 58: 4}
+DEFAULT_MAP = {24: 0, 26: 1, 35: 2, 36: 2, 52: 3, 54: 3, 58: 3}
 
 
 def lane_for_name(name):
@@ -45,12 +45,10 @@ def lane_for_name(name):
         return 0
     if "snare" in n:
         return 1
-    if "rack" in n or n in ("tom 1", "tom1", "hi tom", "high tom"):
+    if "rack" in n or "floor" in n or "tom" in n:      # all toms share one lane
         return 2
-    if "floor" in n or n in ("tom 2", "tom2", "low tom"):
-        return 3
     if "crash" in n:
-        return 4
+        return 3
     return None
 
 
@@ -268,7 +266,7 @@ def assign_tiers(notes, tempo):
                  (pushes, syncopated accents).
       1 Medium - everything on the 8th-note grid (max 3 pads at once).
       2 Kyle   - every note."""
-    lane_w = [2.0, 2.2, 1.4, 1.4, 2.1]          # kick, snare, tom1, tom2, crash
+    lane_w = [2.0, 2.2, 1.4, 2.1]               # kick, snare, tom, crash
     TOL = 0.06                                   # quantise tolerance in quarter notes
     for nt in notes:
         beat = tempo.beat_at(nt["t"])

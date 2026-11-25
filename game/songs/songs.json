@@ -7,9 +7,9 @@
       "bpm": 160.0,
       "duration": 213.7,
       "counts": {
-        "easy": 678,
-        "medium": 1155,
-        "kyle": 1650
+        "easy": 673,
+        "medium": 1150,
+        "kyle": 1645
       }
     },
     {
@@ -19,9 +19,9 @@
       "bpm": 168.0,
       "duration": 135.2,
       "counts": {
-        "easy": 319,
-        "medium": 429,
-        "kyle": 465
+        "easy": 314,
+        "medium": 424,
+        "kyle": 460
       }
     },
     {
@@ -31,9 +31,9 @@
       "bpm": 124.5,
       "duration": 138.4,
       "counts": {
-        "easy": 336,
-        "medium": 640,
-        "kyle": 668
+        "easy": 329,
+        "medium": 631,
+        "kyle": 659
       }
     },
     {
@@ -43,9 +43,9 @@
       "bpm": 111.0,
       "duration": 141.7,
       "counts": {
-        "easy": 321,
-        "medium": 487,
-        "kyle": 658
+        "easy": 318,
+        "medium": 484,
+        "kyle": 655
       }
     },
     {
@@ -67,9 +67,9 @@
       "bpm": 171.0,
       "duration": 181.1,
       "counts": {
-        "easy": 546,
-        "medium": 855,
-        "kyle": 1005
+        "easy": 544,
+        "medium": 853,
+        "kyle": 1002
       }
     },
     {
@@ -79,9 +79,9 @@
       "bpm": 113.0,
       "duration": 167.7,
       "counts": {
-        "easy": 416,
-        "medium": 740,
-        "kyle": 1077
+        "easy": 405,
+        "medium": 725,
+        "kyle": 1060
       }
     },
     {
@@ -91,9 +91,9 @@
       "bpm": 92.0,
       "duration": 626.0,
       "counts": {
-        "easy": 1208,
-        "medium": 2385,
-        "kyle": 3741
+        "easy": 1191,
+        "medium": 2366,
+        "kyle": 3722
       }
     },
     {
@@ -103,9 +103,9 @@
       "bpm": 110.0,
       "duration": 71.4,
       "counts": {
-        "easy": 177,
-        "medium": 274,
-        "kyle": 399
+        "easy": 173,
+        "medium": 267,
+        "kyle": 392
       }
     },
     {
@@ -115,9 +115,9 @@
       "bpm": 170.0,
       "duration": 217.7,
       "counts": {
-        "easy": 751,
-        "medium": 1209,
-        "kyle": 1301
+        "easy": 749,
+        "medium": 1207,
+        "kyle": 1298
       }
     },
     {
@@ -127,9 +127,9 @@
       "bpm": 153.0,
       "duration": 174.4,
       "counts": {
-        "easy": 638,
-        "medium": 1084,
-        "kyle": 1410
+        "easy": 619,
+        "medium": 1059,
+        "kyle": 1385
       }
     }
   ]
