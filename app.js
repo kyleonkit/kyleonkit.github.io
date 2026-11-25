@@ -139,10 +139,10 @@
           const lab = document.createElement("span");
           lab.textContent = g.label;
           top.appendChild(lab);
+          if (g.url) top.appendChild(arrowEl());
           const num = document.createElement("span");
           num.className = "stat-num";
           num.textContent = g.stat;
-          if (g.url) num.appendChild(arrowEl());
           const what = document.createElement("span");
           what.className = "stat-label";
           what.textContent = g.statLabel || "";

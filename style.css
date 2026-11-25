@@ -313,11 +313,18 @@ body {
   color: var(--yellow);
 }
 /* Link arrows on band tiles and chips */
-.stat-num { display: flex; align-items: center; }
-.stat-num .arrow {
+/* Header row: icon + name, arrow pushed to the right on the same line */
+.stat-top > span:not(.ico):not(.arrow) {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stat-top .arrow {
+  flex: none;
   margin-left: auto;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   color: var(--muted);
   transition: transform 0.15s, color 0.15s;
 }
@@ -393,6 +400,11 @@ body {
 
 @media (max-width: 480px) {
   .tagline { font-size: 11px; letter-spacing: 0.08em; }
+  /* Room for the arrow beside long names like "YouTube Music" */
+  .group { padding: 16px 14px; }
+  .stats { gap: 7px; }
+  .stat { padding: 12px; }
+  .stat-top { gap: 6px; font-size: 11.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
