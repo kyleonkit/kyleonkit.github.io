@@ -7,9 +7,9 @@
 
   // ───────── Constants ─────────
   const LANES = [
-    { name: "KICK",   pad: "▲ Y / LB", key: "SPACE / ↑ / D", color: "#ff8a12", dark: "#7a3a00", light: "#ffd09c" },
+    { name: "KICK",   pad: "▼ A / LB", key: "SPACE / ↓ / S", color: "#ff8a12", dark: "#7a3a00", light: "#ffd09c" },
     { name: "SNARE",  pad: "◀ X", key: "← A", color: "#e8262b", dark: "#6b0a0c", light: "#ff9c9c" },
-    { name: "TOM",    pad: "▼ A", key: "↓ S", color: "#f5d20d", dark: "#7a6400", light: "#fff3a0" },
+    { name: "TOM",    pad: "▲ Y", key: "↑ D", color: "#f5d20d", dark: "#7a6400", light: "#fff3a0" },
     { name: "CYMBAL", pad: "▶ B", key: "→ F", color: "#1e9bff", dark: "#063f73", light: "#9fd6ff" },
   ];
   const NL = LANES.length;
@@ -36,7 +36,7 @@
   }
   // Esc leaves full screen before the page sees the key: treat it as pause
   document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement) pause(); });
-  const KEYMAP = { ArrowUp: 0, KeyD: 0, Space: 0, ArrowLeft: 1, KeyA: 1, ArrowDown: 2, KeyS: 2, ArrowRight: 3, KeyF: 3 }; // ← snare, ↓ tom, ↑ kick, → cymbal
+  const KEYMAP = { ArrowDown: 0, KeyS: 0, Space: 0, ArrowLeft: 1, KeyA: 1, ArrowUp: 2, KeyD: 2, ArrowRight: 3, KeyF: 3 }; // ← snare, ↓ kick, ↑ tom, → cymbal
   const DIFFS = {
     easy:   { label: "Easy",   tier: 0, look: 1.9,  miss: 0.018, hint: "Quarter notes (a few 8ths where the groove needs them), slower highway." },
     medium: { label: "Medium", tier: 1, look: 1.6,  miss: 0.024, hint: "Everything on the 8th-note grid." },
@@ -303,7 +303,7 @@
   // RB/RT = cymbal, Back/Select (or a stick click) = star power, Start = pause.
   // Menus: D-pad moves focus, A selects, B goes back.
   const PAD = { on: false, prev: [], timer: 0 };
-  const PAD_LANE = { 12: 0, 3: 0, 4: 0, 6: 0, 14: 1, 2: 1, 13: 2, 0: 2, 15: 3, 1: 3, 5: 3, 7: 3 }; // up/Y kick, left/X snare, down/A tom, right/B cymbal
+  const PAD_LANE = { 13: 0, 0: 0, 4: 0, 6: 0, 14: 1, 2: 1, 12: 2, 3: 2, 15: 3, 1: 3, 5: 3, 7: 3 }; // down/A kick, left/X snare, up/Y tom, right/B cymbal
   function padPressed(b) { return typeof b === "object" ? b.pressed || b.value > 0.5 : b === 1; }
   function visible(el) { return el.offsetParent !== null && !el.disabled; }
   function menuButtons() {
