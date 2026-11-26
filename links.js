@@ -22,7 +22,7 @@ window.SITE = {
     { icon: "instagram", label: "Instagram", url: "https://www.instagram.com/kyleonkit" },
     { icon: "youtube",   label: "YouTube",   url: "https://www.youtube.com/@kyleonkitdrums" },
     { icon: "tiktok",    label: "TikTok",    url: "https://www.tiktok.com/@kyleonkitdrums" },
-    { icon: "mail",      label: "Email",     url: "mailto:kyleonkit@gmail.com" },
+    { icon: "mail",      label: "Booking",   url: "mailto:kyleonkit@gmail.com" },
   ],
 
   links: [
@@ -31,13 +31,13 @@ window.SITE = {
     // style: "game" → animated button. Game lives in /game (songs in game/songs/).
     { icon: "drum", title: "Be Kyle", subtitle: "Play my drum parts", url: "game/", style: "game" },
     { icon: "tiktok",    title: "TikTok",    subtitle: "@kyleonkitdrums", url: "https://www.tiktok.com/@kyleonkitdrums" },
-    { icon: "mail",      title: "Email",     subtitle: "kyleonkit@gmail.com", url: "mailto:kyleonkit@gmail.com" },
+    { icon: "mail",      title: "Booking",   subtitle: "kyleonkit@gmail.com", url: "mailto:kyleonkit@gmail.com" },
 
     { heading: "Bands" },
 
     {
       group: "Lame Genie",
-      logo: "assets/band-lame-genie.png?v=20261126120926",
+      logo: "assets/band-lame-genie.png?v=20261126121023",
       logoStyle: "wide",
       subtitle: "Video game music covers",
       links: [
@@ -52,7 +52,7 @@ window.SITE = {
     },
     {
       group: "Run For Covers",
-      logo: "assets/band-run-for-covers.png?v=20261126120926",
+      logo: "assets/band-run-for-covers.png?v=20261126121023",
       logoStyle: "boxed",
       subtitle: "Your favorite cover band's favorite cover band",
       links: [
