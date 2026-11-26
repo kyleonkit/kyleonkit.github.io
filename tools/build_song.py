@@ -259,12 +259,13 @@ def find_offset(video, kicks, lo=-30.0, hi=30.0):
 
 
 # ── Two thumbs: never more than 2 notes at once ──────────────────────────
-CHORD_PRIORITY = [2.0, 2.2, 1.4, 2.1]   # kick, snare, tom, crash (+ velocity breaks ties)
+CHORD_PRIORITY = [3.2, 3.3, 1.0, 2.0]   # kick, snare, tom, crash (+ velocity 0..1 breaks ties)
+# Kick and snare always win: the gap between groups is > 1 so velocity never reorders them.
 
 
 def two_at_once(notes, window=0.03):
     """Group hits that land within `window` s of each other and keep the 2 most important.
-    Snare > crash > kick > tom, louder first."""
+    Kick and snare first (user request), then crash, then tom; louder first within a group."""
     out, group = [], []
     def flush():
         group.sort(key=lambda n: -(CHORD_PRIORITY[n["lane"]] + n["vel"] / 127))
@@ -291,7 +292,6 @@ def assign_tiers(notes, tempo):
     Every tier, Kyle included, has at most 2 notes at once (playable with two thumbs);
     see two_at_once().
       2 Kyle   - every note."""
-    lane_w = [2.0, 2.2, 1.4, 2.1]               # kick, snare, tom, crash
     TOL = 0.06                                   # quantise tolerance in quarter notes
     for nt in notes:
         beat = tempo.beat_at(nt["t"])
@@ -300,7 +300,7 @@ def assign_tiers(notes, tempo):
         frac = beat - nt["_q"]
         triplet = abs(frac - 1 / 3) < TOL or abs(frac - 2 / 3) < TOL
         nt["_grid"] = 4 if frac < TOL else 8 if abs(frac - 0.5) < TOL or triplet else 16
-        nt["_score"] = lane_w[nt["lane"]] + nt["vel"] / 127
+        nt["_score"] = CHORD_PRIORITY[nt["lane"]] + nt["vel"] / 127
         nt["tier"] = 2
 
     def cap(chord_notes, k, tier):
