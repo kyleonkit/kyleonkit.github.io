@@ -7,9 +7,9 @@
       "bpm": 160.0,
       "duration": 213.7,
       "counts": {
-        "easy": 667,
-        "medium": 1111,
-        "kyle": 1604
+        "easy": 663,
+        "medium": 1088,
+        "kyle": 1566
       }
     },
     {
@@ -19,9 +19,9 @@
       "bpm": 168.0,
       "duration": 135.2,
       "counts": {
-        "easy": 314,
-        "medium": 424,
-        "kyle": 460
+        "easy": 310,
+        "medium": 420,
+        "kyle": 456
       }
     },
     {
@@ -31,9 +31,9 @@
       "bpm": 124.5,
       "duration": 138.4,
       "counts": {
-        "easy": 329,
-        "medium": 628,
-        "kyle": 656
+        "easy": 326,
+        "medium": 621,
+        "kyle": 649
       }
     },
     {
@@ -45,7 +45,7 @@
       "counts": {
         "easy": 318,
         "medium": 480,
-        "kyle": 651
+        "kyle": 650
       }
     },
     {
@@ -55,9 +55,9 @@
       "bpm": 75.0,
       "duration": 137.8,
       "counts": {
-        "easy": 251,
-        "medium": 578,
-        "kyle": 1034
+        "easy": 246,
+        "medium": 561,
+        "kyle": 1000
       }
     },
     {
@@ -67,9 +67,9 @@
       "bpm": 171.0,
       "duration": 181.1,
       "counts": {
-        "easy": 544,
-        "medium": 850,
-        "kyle": 999
+        "easy": 540,
+        "medium": 839,
+        "kyle": 986
       }
     },
     {
@@ -79,9 +79,9 @@
       "bpm": 113.0,
       "duration": 167.7,
       "counts": {
-        "easy": 405,
-        "medium": 725,
-        "kyle": 1060
+        "easy": 397,
+        "medium": 716,
+        "kyle": 1049
       }
     },
     {
@@ -91,9 +91,9 @@
       "bpm": 73.0,
       "duration": 155.9,
       "counts": {
-        "easy": 221,
-        "medium": 476,
-        "kyle": 738
+        "easy": 213,
+        "medium": 464,
+        "kyle": 725
       }
     },
     {
@@ -103,9 +103,9 @@
       "bpm": 150.0,
       "duration": 141.7,
       "counts": {
-        "easy": 485,
-        "medium": 701,
-        "kyle": 952
+        "easy": 466,
+        "medium": 679,
+        "kyle": 927
       }
     },
     {
@@ -115,9 +115,9 @@
       "bpm": 92.0,
       "duration": 626.0,
       "counts": {
-        "easy": 1191,
-        "medium": 2329,
-        "kyle": 3684
+        "easy": 1179,
+        "medium": 2271,
+        "kyle": 3606
       }
     },
     {
@@ -127,9 +127,9 @@
       "bpm": 151.0,
       "duration": 136.3,
       "counts": {
-        "easy": 352,
-        "medium": 557,
-        "kyle": 681
+        "easy": 346,
+        "medium": 545,
+        "kyle": 667
       }
     },
     {
@@ -140,8 +140,8 @@
       "duration": 67.3,
       "counts": {
         "easy": 73,
-        "medium": 122,
-        "kyle": 247
+        "medium": 121,
+        "kyle": 246
       }
     },
     {
@@ -151,9 +151,9 @@
       "bpm": 110.0,
       "duration": 71.4,
       "counts": {
-        "easy": 173,
-        "medium": 260,
-        "kyle": 383
+        "easy": 172,
+        "medium": 258,
+        "kyle": 380
       }
     },
     {
@@ -163,9 +163,9 @@
       "bpm": 170.0,
       "duration": 217.7,
       "counts": {
-        "easy": 749,
-        "medium": 1199,
-        "kyle": 1290
+        "easy": 739,
+        "medium": 1180,
+        "kyle": 1271
       }
     },
     {
@@ -175,9 +175,9 @@
       "bpm": 153.0,
       "duration": 174.4,
       "counts": {
-        "easy": 619,
-        "medium": 1032,
-        "kyle": 1358
+        "easy": 550,
+        "medium": 942,
+        "kyle": 1265
       }
     },
     {
@@ -187,9 +187,9 @@
       "bpm": 320.0,
       "duration": 133.3,
       "counts": {
-        "easy": 767,
-        "medium": 1057,
-        "kyle": 1064
+        "easy": 689,
+        "medium": 972,
+        "kyle": 979
       }
     },
     {
@@ -199,9 +199,9 @@
       "bpm": 192.0,
       "duration": 107.3,
       "counts": {
-        "easy": 441,
-        "medium": 716,
-        "kyle": 870
+        "easy": 416,
+        "medium": 687,
+        "kyle": 843
       }
     },
     {
@@ -223,9 +223,9 @@
       "bpm": 160.0,
       "duration": 181.9,
       "counts": {
-        "easy": 483,
-        "medium": 781,
-        "kyle": 1072
+        "easy": 454,
+        "medium": 716,
+        "kyle": 1005
       }
     },
     {
@@ -236,8 +236,8 @@
       "duration": 146.4,
       "counts": {
         "easy": 372,
-        "medium": 811,
-        "kyle": 1032
+        "medium": 808,
+        "kyle": 1021
       }
     },
     {
@@ -247,9 +247,9 @@
       "bpm": 140.0,
       "duration": 215.5,
       "counts": {
-        "easy": 637,
-        "medium": 978,
-        "kyle": 1325
+        "easy": 625,
+        "medium": 961,
+        "kyle": 1306
       }
     },
     {
@@ -259,9 +259,9 @@
       "bpm": 148.0,
       "duration": 173.0,
       "counts": {
-        "easy": 580,
-        "medium": 989,
-        "kyle": 1388
+        "easy": 556,
+        "medium": 940,
+        "kyle": 1330
       }
     },
     {
@@ -271,9 +271,9 @@
       "bpm": 170.000000008,
       "duration": 233.8,
       "counts": {
-        "easy": 627,
-        "medium": 1048,
-        "kyle": 1203
+        "easy": 618,
+        "medium": 1031,
+        "kyle": 1186
       }
     },
     {
@@ -283,9 +283,9 @@
       "bpm": 147.5,
       "duration": 151.5,
       "counts": {
-        "easy": 508,
-        "medium": 962,
-        "kyle": 1485
+        "easy": 480,
+        "medium": 831,
+        "kyle": 1341
       }
     },
     {
@@ -295,9 +295,9 @@
       "bpm": 200.0,
       "duration": 265.8,
       "counts": {
-        "easy": 1077,
-        "medium": 1754,
-        "kyle": 2145
+        "easy": 1024,
+        "medium": 1685,
+        "kyle": 2075
       }
     },
     {
@@ -307,9 +307,9 @@
       "bpm": 133.0,
       "duration": 202.1,
       "counts": {
-        "easy": 577,
-        "medium": 957,
-        "kyle": 1392
+        "easy": 556,
+        "medium": 907,
+        "kyle": 1330
       }
     },
     {
@@ -319,9 +319,9 @@
       "bpm": 175.0,
       "duration": 104.6,
       "counts": {
-        "easy": 370,
-        "medium": 599,
-        "kyle": 800
+        "easy": 357,
+        "medium": 585,
+        "kyle": 784
       }
     },
     {
@@ -331,9 +331,9 @@
       "bpm": 140.0,
       "duration": 182.1,
       "counts": {
-        "easy": 527,
-        "medium": 1010,
-        "kyle": 1606
+        "easy": 508,
+        "medium": 969,
+        "kyle": 1546
       }
     },
     {
@@ -343,9 +343,9 @@
       "bpm": 150.0,
       "duration": 323.5,
       "counts": {
-        "easy": 945,
-        "medium": 1437,
-        "kyle": 1847
+        "easy": 909,
+        "medium": 1392,
+        "kyle": 1796
       }
     },
     {
@@ -355,9 +355,9 @@
       "bpm": 150.0,
       "duration": 123.2,
       "counts": {
-        "easy": 407,
-        "medium": 623,
-        "kyle": 918
+        "easy": 380,
+        "medium": 588,
+        "kyle": 874
       }
     },
     {
@@ -367,9 +367,9 @@
       "bpm": 132.0,
       "duration": 229.8,
       "counts": {
-        "easy": 578,
-        "medium": 970,
-        "kyle": 1229
+        "easy": 540,
+        "medium": 916,
+        "kyle": 1163
       }
     },
     {
@@ -379,9 +379,9 @@
       "bpm": 150.0,
       "duration": 103.1,
       "counts": {
-        "easy": 341,
-        "medium": 553,
-        "kyle": 898
+        "easy": 319,
+        "medium": 520,
+        "kyle": 857
       }
     },
     {
@@ -391,9 +391,9 @@
       "bpm": 150.0,
       "duration": 99.6,
       "counts": {
-        "easy": 327,
-        "medium": 521,
-        "kyle": 655
+        "easy": 320,
+        "medium": 513,
+        "kyle": 645
       }
     },
     {
@@ -403,9 +403,9 @@
       "bpm": 175.0,
       "duration": 203.3,
       "counts": {
-        "easy": 590,
-        "medium": 916,
-        "kyle": 1115
+        "easy": 588,
+        "medium": 914,
+        "kyle": 1113
       }
     },
     {
@@ -415,9 +415,9 @@
       "bpm": 153.0,
       "duration": 103.7,
       "counts": {
-        "easy": 337,
-        "medium": 511,
-        "kyle": 832
+        "easy": 328,
+        "medium": 502,
+        "kyle": 823
       }
     },
     {
@@ -427,9 +427,9 @@
       "bpm": 205.0,
       "duration": 167.2,
       "counts": {
-        "easy": 574,
-        "medium": 948,
-        "kyle": 1434
+        "easy": 557,
+        "medium": 930,
+        "kyle": 1414
       }
     },
     {
@@ -439,9 +439,9 @@
       "bpm": 180.0,
       "duration": 138.1,
       "counts": {
-        "easy": 346,
-        "medium": 542,
-        "kyle": 587
+        "easy": 341,
+        "medium": 537,
+        "kyle": 582
       }
     },
     {
@@ -451,9 +451,9 @@
       "bpm": 95.0,
       "duration": 109.7,
       "counts": {
-        "easy": 197,
-        "medium": 296,
-        "kyle": 560
+        "easy": 195,
+        "medium": 294,
+        "kyle": 558
       }
     },
     {
@@ -463,9 +463,9 @@
       "bpm": 147.0,
       "duration": 305.6,
       "counts": {
-        "easy": 998,
-        "medium": 1651,
-        "kyle": 1977
+        "easy": 970,
+        "medium": 1607,
+        "kyle": 1933
       }
     },
     {
@@ -475,9 +475,9 @@
       "bpm": 120.0,
       "duration": 103.5,
       "counts": {
-        "easy": 285,
-        "medium": 473,
-        "kyle": 658
+        "easy": 268,
+        "medium": 446,
+        "kyle": 621
       }
     },
     {
@@ -487,9 +487,9 @@
       "bpm": 124.5,
       "duration": 207.7,
       "counts": {
-        "easy": 596,
-        "medium": 948,
-        "kyle": 1139
+        "easy": 588,
+        "medium": 938,
+        "kyle": 1124
       }
     }
   ]

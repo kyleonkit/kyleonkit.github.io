@@ -260,25 +260,32 @@ def find_offset(video, kicks, lo=-30.0, hi=30.0):
 
 # ── Two thumbs: never more than 2 notes at once ──────────────────────────
 CHORD_PRIORITY = [3.2, 3.3, 1.0, 2.0]   # kick, snare, tom, crash (+ velocity 0..1 breaks ties)
-# Kick and snare always win: the gap between groups is > 1 so velocity never reorders them.
+# Snare first, then kick, then crash, then tom; the gaps are > 1 so velocity never reorders lanes.
+
+
+def legal_chord(group):
+    """User rule: snare is first; kick and snare NEVER together. The only allowed pairs are
+    kick + (crash or tom) and snare + (crash or tom). Returns the notes to keep."""
+    best = lambda lane: max((n for n in group if n["lane"] == lane), key=lambda n: n["vel"], default=None)
+    hand = best(1) or best(0)                     # snare wins over kick
+    others = [x for x in (best(3), best(2)) if x]  # crash before tom
+    if hand:
+        return [hand] + others[:1]
+    return others[:1]                              # tom + crash alone: keep just one
 
 
 def two_at_once(notes, window=0.03):
-    """Group hits that land within `window` s of each other and keep the 2 most important.
-    Kick and snare first (user request), then crash, then tom; louder first within a group."""
+    """Group hits that land within `window` s of each other and keep a legal chord (see legal_chord)."""
     out, group = [], []
-    def flush():
-        group.sort(key=lambda n: -(CHORD_PRIORITY[n["lane"]] + n["vel"] / 127))
-        out.extend(group[:2])
     for nt in notes:
         if group and nt["t"] - group[0]["t"] > window:
-            flush(); group = []
+            out.extend(legal_chord(group)); group = []
         group.append(nt)
     if group:
-        flush()
+        out.extend(legal_chord(group))
     dropped = len(notes) - len(out)
     if dropped:
-        print(f"  two-thumb limit: dropped {dropped} notes from 3+ note chords")
+        print(f"  chord rule: dropped {dropped} notes (no kick+snare, max 2 at once)")
     return sorted(out, key=lambda n: (n["t"], n["lane"]))
 
 
