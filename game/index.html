@@ -8,11 +8,11 @@
   <meta name="theme-color" content="#000000">
   <meta property="og:title" content="Be Kyle">
   <meta property="og:description" content="Tap along to Kyle on Kit's drum parts.">
-  <link rel="icon" type="image/png" href="../assets/favicon.png?v=20261126101604">
+  <link rel="icon" type="image/png" href="../assets/favicon.png?v=20261126103910">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,700;0,900;1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="game.css?v=20261126101604">
+  <link rel="stylesheet" href="game.css?v=20261126103910">
 </head>
 <body>
   <!-- ───────── Song select ───────── -->
@@ -58,6 +58,10 @@
       <label class="row-label">Difficulty</label>
       <div class="diff" id="diffSet"></div>
       <p class="hint" id="diffHint"></p>
+
+      <label class="row-label">Layout</label>
+      <div class="diff" id="layoutSet" role="radiogroup"></div>
+      <p class="hint" id="layoutHint"></p>
 
       <label class="row-label" for="delay">Audio delay <span id="delayVal">0 ms</span></label>
       <input type="range" id="delay" min="-400" max="400" step="5" value="0">
@@ -121,6 +125,6 @@
     </div>
   </div>
 
-  <script src="game.js?v=20261126101604"></script>
+  <script src="game.js?v=20261126103910"></script>
 </body>
 </html>

@@ -484,3 +484,4 @@ body.desk #game .stage {
 .pad-help { display: none; }
 body.pad .pad-help { display: block; margin-top: 6px; }
 body.pad :focus { outline: 3px solid var(--yellow); outline-offset: 3px; }
+#layoutSet button { white-space: nowrap; padding: 10px 12px; letter-spacing: 0.04em; }
