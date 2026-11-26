@@ -491,6 +491,18 @@
         "medium": 938,
         "kyle": 1124
       }
+    },
+    {
+      "id": "smbmedley",
+      "title": "NES Medley (Super Mario Bros)",
+      "artist": "Lame Genie",
+      "bpm": 104.999999992,
+      "duration": 204.0,
+      "counts": {
+        "easy": 545,
+        "medium": 897,
+        "kyle": 1378
+      }
     }
   ]
 }
