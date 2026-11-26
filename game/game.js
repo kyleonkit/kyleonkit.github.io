@@ -7,12 +7,17 @@
 
   // ───────── Constants ─────────
   const LANES = [
-    { name: "KICK",   pad: "◀ X", key: "← A", color: "#22c33a", dark: "#0b5c16", light: "#9cff9c" },
-    { name: "SNARE",  pad: "▼ A", key: "↓ S", color: "#e8262b", dark: "#6b0a0c", light: "#ff9c9c" },
-    { name: "TOM",    pad: "▲ Y", key: "↑ D", color: "#f5d20d", dark: "#7a6400", light: "#fff3a0" },
-    { name: "CYMBAL", pad: "▶ B", key: "→ F", color: "#ff8a12", dark: "#7a3a00", light: "#ffd09c" },
+    { name: "KICK",   pad: "▲ Y / LB", key: "SPACE / ↑ / D", color: "#ff8a12", dark: "#7a3a00", light: "#ffd09c" },
+    { name: "SNARE",  pad: "◀ X", key: "← A", color: "#e8262b", dark: "#6b0a0c", light: "#ff9c9c" },
+    { name: "TOM",    pad: "▼ A", key: "↓ S", color: "#f5d20d", dark: "#7a6400", light: "#fff3a0" },
+    { name: "CYMBAL", pad: "▶ B", key: "→ F", color: "#1e9bff", dark: "#063f73", light: "#9fd6ff" },
   ];
   const NL = LANES.length;
+  // Highway layout (drum-game style): kick = a bar across the whole highway; snare, tom,
+  // cymbal = three pads left → right. COL maps chart lane → pad column (-1 = kick bar).
+  const COL = [-1, 0, 1, 2];
+  const NC = 3;
+  const FRET = 0.78, GEM = 0.7;               // pad / gem width as a share of a column
   // Desktop (mouse + keyboard): show keycaps; on wide windows go full screen with the video behind the highway
   const KEYS = matchMedia("(hover: hover) and (pointer: fine)").matches;
   let DESK = false;
@@ -31,7 +36,7 @@
   }
   // Esc leaves full screen before the page sees the key: treat it as pause
   document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement) pause(); });
-  const KEYMAP = { ArrowLeft: 0, KeyA: 0, Space: 0, ArrowDown: 1, KeyS: 1, ArrowUp: 2, KeyD: 2, ArrowRight: 3, KeyF: 3 };
+  const KEYMAP = { ArrowUp: 0, KeyD: 0, Space: 0, ArrowLeft: 1, KeyA: 1, ArrowDown: 2, KeyS: 2, ArrowRight: 3, KeyF: 3 }; // ← snare, ↓ tom, ↑ kick, → cymbal
   const DIFFS = {
     easy:   { label: "Easy",   tier: 0, look: 1.9,  miss: 0.018, hint: "Quarter notes (a few 8ths where the groove needs them), slower highway." },
     medium: { label: "Medium", tier: 1, look: 1.6,  miss: 0.024, hint: "Everything on the 8th-note grid." },
@@ -298,7 +303,7 @@
   // RB/RT = cymbal, Back/Select (or a stick click) = star power, Start = pause.
   // Menus: D-pad moves focus, A selects, B goes back.
   const PAD = { on: false, prev: [], timer: 0 };
-  const PAD_LANE = { 14: 0, 2: 0, 4: 0, 6: 0, 13: 1, 0: 1, 12: 2, 3: 2, 15: 3, 1: 3, 5: 3, 7: 3 };
+  const PAD_LANE = { 12: 0, 3: 0, 4: 0, 6: 0, 14: 1, 2: 1, 13: 2, 0: 2, 15: 3, 1: 3, 5: 3, 7: 3 }; // up/Y kick, left/X snare, down/A tom, right/B cymbal
   function padPressed(b) { return typeof b === "object" ? b.pressed || b.value > 0.5 : b === 1; }
   function visible(el) { return el.offsetParent !== null && !el.disabled; }
   function menuButtons() {
@@ -492,13 +497,18 @@
   }
 
   // ───────── Input ─────────
-  function laneAtX(x) {
+  // Anything below the pads is the kick; above that, the pad column under the finger
+  function laneAt(e) {
     const r = canvas.getBoundingClientRect();
-    return Math.max(0, Math.min(NL - 1, Math.floor(((x - r.left) / r.width) * NL)));
+    const g = geom();
+    const x = (e.clientX - r.left) * DPR, y = (e.clientY - r.top) * DPR;
+    if (y > g.kickY) return 0;
+    const c = Math.floor(((x - xAt(g, 0, 1)) / g.wNear) * NC);
+    return 1 + Math.max(0, Math.min(NC - 1, c));
   }
   canvas.addEventListener("pointerdown", (e) => {
     e.preventDefault();
-    hitLane(laneAtX(e.clientX), e.timeStamp || performance.now());
+    hitLane(laneAt(e), e.timeStamp || performance.now());
   }, { passive: false });
   // Block scroll/zoom gestures on the game area
   $("game").addEventListener("touchstart", (e) => { if (e.target === canvas) e.preventDefault(); }, { passive: false });
@@ -703,23 +713,26 @@
   const S_FAR = 0.3;
   function geom() {
     const caps = KEYS || PAD.on;               // show keycaps / controller buttons
-    const labelH = (caps ? 56 : 26) * DPR;
-    // Phones: lift the pads off the bottom edge (home bar / thumbs resting on the bezel).
-    // The space below still counts as part of each lane for taps.
-    const lift = KEYS ? 0 : Math.max(96 * DPR, H * 0.17);
-    const bottom = H - lift;
-    const yStrike = bottom - labelH - 34 * DPR;
-    const yTop = H * 0.04;
     // Desktop: the stage sits over the video, so the whole highway (it widens ~17% below
     // the strike line) must fit inside it. Phones keep full-width lanes for fingers.
     const wNear = W * (DESK ? 0.8 : 0.96);
+    const laneW = wNear / NC;
+    const ry = (laneW * FRET / 2) * 0.42;       // pad ellipse half-height
+    // Kick zone along the bottom: a big thumb area on phones, a slim bar on desktop
+    const kickH = KEYS ? 46 * DPR : Math.max(110 * DPR, H * 0.2);
+    const kickTop = H - kickH;
+    const capRow = caps ? 32 * DPR : 0;
+    const yStrike = kickTop - capRow - ry * 1.5 - 6 * DPR;
+    const kickY = yStrike + ry * 1.3;          // taps below this line = kick
+    const yTop = H * 0.04;
     const yV = (yTop - yStrike * S_FAR) / (1 - S_FAR);
-    return { yStrike, yTop, wNear, yV, cx: W / 2, labelH, bottom };
+    return { yStrike, yTop, wNear, yV, cx: W / 2, laneW, ry, kickTop, kickY, capRow, bottom: kickTop - capRow };
   }
   // z: 0 = strike line, 1 = far end (can be <0 for notes that passed)
   const sAt = (z) => 1 / (1 + z * (1 / S_FAR - 1));
   const yAt = (g, s) => g.yV + (g.yStrike - g.yV) * s;
-  const xAt = (g, laneEdge, s) => g.cx + (laneEdge / NL - 0.5) * g.wNear * s; // laneEdge 0..NL
+  const xAt = (g, edge, s) => g.cx + (edge / NC - 0.5) * g.wNear * s; // edge 0..NC (pad columns)
+  const padX = (g, lane, s) => xAt(g, COL[lane] + 0.5, s);
 
   let raf = 0;
   function frame() {
@@ -796,11 +809,11 @@
 
     // Highway body
     const sB = sAt(-0.06), sT = S_FAR;
-    const yB = Math.min(g.bottom - g.labelH, yAt(g, sB));
+    const yB = Math.min(g.bottom, yAt(g, sB));
     ctx.beginPath();
     ctx.moveTo(xAt(g, 0, sT), g.yTop);
-    ctx.lineTo(xAt(g, NL, sT), g.yTop);
-    ctx.lineTo(xAt(g, NL, sB), yB);
+    ctx.lineTo(xAt(g, NC, sT), g.yTop);
+    ctx.lineTo(xAt(g, NC, sB), yB);
     ctx.lineTo(xAt(g, 0, sB), yB);
     ctx.closePath();
     const hw = ctx.createLinearGradient(0, g.yTop, 0, g.yStrike);
@@ -822,11 +835,11 @@
       const s = sAt(z), y = yAt(g, s);
       ctx.beginPath();
       ctx.moveTo(xAt(g, 0, s), y);
-      ctx.lineTo(xAt(g, NL, s), y);
+      ctx.lineTo(xAt(g, NC, s), y);
       ctx.stroke();
     }
     // Lane dividers
-    for (let l = 1; l < NL; l++) {
+    for (let l = 1; l < NC; l++) {
       ctx.strokeStyle = "rgba(255,255,255,0.10)";
       ctx.lineWidth = 1.2 * DPR;
       ctx.beginPath();
@@ -844,7 +857,7 @@
       ctx.lineWidth = (b[1] ? 3 : 1.5) * DPR * s;
       ctx.beginPath();
       ctx.moveTo(xAt(g, 0, s), y);
-      ctx.lineTo(xAt(g, NL, s), y);
+      ctx.lineTo(xAt(g, NC, s), y);
       ctx.stroke();
     }
     // Fade the far end into the dark
@@ -862,7 +875,7 @@
     ctx.strokeStyle = railC;
     ctx.shadowColor = sp ? "#59e6ff" : danger ? "#ff0000" : "rgba(255,200,120,0.6)";
     ctx.shadowBlur = (sp || danger ? 18 : 8) * DPR;
-    for (const e of [0, NL]) {
+    for (const e of [0, NC]) {
       ctx.beginPath();
       ctx.moveTo(xAt(g, e, sT), g.yTop + (g.yStrike - g.yTop) * 0.08);
       ctx.lineTo(xAt(g, e, sB), yB);
@@ -870,15 +883,24 @@
     }
     ctx.shadowBlur = 0;
 
-    // Strike line bar
-    ctx.fillStyle = "rgba(255,255,255,0.12)";
-    ctx.fillRect(xAt(g, 0, 1), g.yStrike - 3 * DPR, g.wNear, 6 * DPR);
+    // Kick strike line: an orange bar right across the highway, under the pads
+    const kickLit = G.pressed[0] && now - G.pressed[0] < 120;
+    const K = LANES[0];
+    ctx.save();
+    if (kickLit) { ctx.shadowColor = K.color; ctx.shadowBlur = 22 * DPR; }
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    roundRect(xAt(g, 0, 1), g.yStrike - 5 * DPR, g.wNear, 12 * DPR, 6 * DPR);
+    ctx.fill();
+    ctx.fillStyle = kickLit ? K.light : K.color;
+    roundRect(xAt(g, 0, 1), g.yStrike - 5 * DPR, g.wNear, 9 * DPR, 4.5 * DPR);
+    ctx.fill();
+    ctx.restore();
 
-    // Fret buttons (targets)
-    const laneW = g.wNear / NL;
-    for (let l = 0; l < NL; l++) drawFret(g, l, laneW, now);
+    // Pads (targets): snare, tom, cymbal
+    const laneW = g.laneW;
+    for (let l = 1; l < NL; l++) drawFret(g, l, laneW, now);
 
-    // Notes: far → near
+    // Notes: far → near (kick bars under pad gems at the same moment)
     const visible = [];
     for (let l = 0; l < NL; l++) {
       const list = G.byLane[l];
@@ -886,54 +908,109 @@
         const n = list[i];
         const z = zOf(n.t);
         if (z > 1.02) break;
-        if (z < -0.12) continue;
+        if (!(z >= -0.12)) continue;            // also skips NaN (clock not ready)
         if (n.hit && now - n.hitAt > 0) continue;
         visible.push([z, n]);
       }
     }
-    visible.sort((a, b) => b[0] - a[0]);
+    visible.sort((a, b) => b[0] - a[0] || (a[1].lane === 0 ? -1 : b[1].lane === 0 ? 1 : 0));
     for (const [z, n] of visible) {
       const s = sAt(z);
       const y = yAt(g, s);
-      const x = xAt(g, n.lane + 0.5, s);
       const alpha = z < 1 ? Math.min(1, (1 - z) / 0.12) : 0;
       const missed = n.miss || (z < 0 && !n.hit);
       ctx.globalAlpha = missed ? Math.max(0, 0.55 + z * 4) * alpha : alpha;
       const isStar = n.star >= 0 && !G.phrases[n.star].broken;
-      drawGem(x, y, laneW * 0.8 * s, LANES[n.lane], sp ? "sp" : isStar ? "star" : "", missed);
+      const mode = sp ? "sp" : isStar ? "star" : "";
+      if (n.lane === 0) drawKickGem(g, y, s, mode, missed);
+      else drawGem(padX(g, n.lane, s), y, laneW * GEM * s, LANES[n.lane], mode, missed);
       ctx.globalAlpha = 1;
     }
 
     // Hit flames + particles
     drawEffects(g, laneW, now);
 
-    // Lane labels
-    ctx.font = `900 ${10.5 * DPR}px Montserrat, sans-serif`;
+    // Pad names sit on the pads
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    for (let l = 0; l < NL; l++) {
+    for (let l = 1; l < NL; l++) {
       const lit = G.pressed[l] && now - G.pressed[l] < 120;
-      const x = xAt(g, l + 0.5, 1);
-      ctx.fillStyle = lit ? LANES[l].light : "rgba(255,255,255,0.55)";
-      if (!(KEYS || PAD.on)) { ctx.fillText(LANES[l].name, x, g.bottom - g.labelH / 2 - 2 * DPR); continue; }
-      ctx.fillText(LANES[l].name, x, g.bottom - g.labelH + 10 * DPR);
-      // Keycap
-      const k = PAD.on ? LANES[l].pad : LANES[l].key.toUpperCase();
+      const x = padX(g, l, 1);
+      ctx.font = `900 ${Math.min(13, 9 + laneW / DPR / 40) * DPR}px Montserrat, sans-serif`;
+      ctx.fillStyle = lit ? "#000" : "rgba(255,255,255,0.85)";
+      ctx.fillText(LANES[l].name, x, g.yStrike + (lit ? 3 * DPR : 0));
+      if (g.capRow) keycap(PAD.on ? LANES[l].pad : LANES[l].key.toUpperCase(), x, g.kickTop - g.capRow / 2, LANES[l], lit);
+    }
+
+    // Kick zone: everything under the pads
+    const kx0 = DESK ? xAt(g, 0, 1) : 8 * DPR, kx1 = DESK ? xAt(g, NC, 1) : W - 8 * DPR;
+    const ky0 = g.kickTop + 4 * DPR, ky1 = H - (KEYS ? 4 : 12) * DPR;
+    roundRect(kx0, ky0, kx1 - kx0, ky1 - ky0, 14 * DPR);
+    const kz = ctx.createLinearGradient(0, ky0, 0, ky1);
+    kz.addColorStop(0, kickLit ? "rgba(255,170,60,0.65)" : "rgba(255,138,18,0.26)");
+    kz.addColorStop(1, kickLit ? "rgba(255,120,0,0.35)" : "rgba(255,138,18,0.08)");
+    ctx.fillStyle = kz;
+    ctx.fill();
+    ctx.lineWidth = 2 * DPR;
+    ctx.strokeStyle = kickLit ? K.light : "rgba(255,138,18,0.75)";
+    ctx.stroke();
+    ctx.font = `900 ${(KEYS ? 13 : 16) * DPR}px Montserrat, sans-serif`;
+    ctx.fillStyle = kickLit ? "#fff" : "rgba(255,210,160,0.95)";
+    const kyMid = (ky0 + ky1) / 2;
+    if (g.capRow) {
+      const label = "KICK", k = PAD.on ? K.pad : K.key;
+      ctx.font = `900 ${13 * DPR}px Montserrat, sans-serif`;
+      const lw = ctx.measureText(label).width;
       ctx.font = `900 ${12 * DPR}px Montserrat, sans-serif`;
-      const kw = Math.max(26 * DPR, ctx.measureText(k).width + 16 * DPR), kh = 24 * DPR;
-      const ky = g.bottom - kh - 6 * DPR;
-      roundRect(x - kw / 2, ky, kw, kh, 5 * DPR);
-      ctx.fillStyle = lit ? LANES[l].color : "rgba(255,255,255,0.08)";
-      ctx.fill();
-      ctx.lineWidth = 1.5 * DPR;
-      ctx.strokeStyle = lit ? LANES[l].light : LANES[l].color;
-      ctx.stroke();
-      ctx.fillStyle = lit ? "#000" : "#fff";
-      ctx.fillText(k, x, ky + kh / 2 + 1 * DPR);
-      ctx.font = `900 ${10.5 * DPR}px Montserrat, sans-serif`;
+      const kw = ctx.measureText(k).width + 16 * DPR;
+      const gap = 12 * DPR, total = lw + gap + kw;
+      ctx.font = `900 ${13 * DPR}px Montserrat, sans-serif`;
+      ctx.fillStyle = kickLit ? "#fff" : "rgba(255,210,160,0.95)";
+      ctx.fillText(label, g.cx - total / 2 + lw / 2, kyMid);
+      keycap(k, g.cx - total / 2 + lw + gap + kw / 2, kyMid, K, kickLit);
+    } else {
+      ctx.fillText("KICK", g.cx, kyMid);
     }
 
     drawHUD(g, now);
+  }
+
+  function keycap(k, x, y, L, lit) {
+    ctx.font = `900 ${12 * DPR}px Montserrat, sans-serif`;
+    const kw = Math.max(26 * DPR, ctx.measureText(k).width + 16 * DPR), kh = 24 * DPR;
+    roundRect(x - kw / 2, y - kh / 2, kw, kh, 5 * DPR);
+    ctx.fillStyle = lit ? L.color : "rgba(0,0,0,0.55)";
+    ctx.fill();
+    ctx.lineWidth = 1.5 * DPR;
+    ctx.strokeStyle = lit ? L.light : L.color;
+    ctx.stroke();
+    ctx.fillStyle = lit ? "#000" : "#fff";
+    ctx.fillText(k, x, y + 1 * DPR);
+  }
+
+  // Kick note: a bar across the whole highway
+  function drawKickGem(g, y, s, mode, missed) {
+    const L = LANES[0];
+    const x0 = xAt(g, 0, s) + 4 * DPR * s, x1 = xAt(g, NC, s) - 4 * DPR * s;
+    const h = Math.max(4 * DPR, 18 * DPR * s);
+    const body = missed ? "#555" : mode === "sp" ? "#7fe8ff" : L.color;
+    const dark = missed ? "#222" : mode === "sp" ? "#0b6f99" : L.dark;
+    const top = missed ? "#888" : mode === "sp" ? "#e6fbff" : mode === "star" ? "#fff6d8" : L.light;
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    roundRect(x0, y - h / 2 + h * 0.35, x1 - x0, h, h / 2);
+    ctx.fill();
+    const grd = ctx.createLinearGradient(0, y - h / 2, 0, y + h / 2);
+    grd.addColorStop(0, top);
+    grd.addColorStop(0.5, body);
+    grd.addColorStop(1, dark);
+    ctx.fillStyle = grd;
+    roundRect(x0, y - h / 2, x1 - x0, h, h / 2);
+    ctx.fill();
+    if (mode === "star" && !missed) {
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = Math.max(1, 2.5 * DPR * s);
+      ctx.stroke();
+    }
   }
 
   function ellipse(x, y, rx, ry) {
@@ -942,8 +1019,8 @@
   }
 
   function drawFret(g, l, laneW, now) {
-    const x = xAt(g, l + 0.5, 1), y = g.yStrike;
-    const w = laneW * 0.84, rx = w / 2, ry = rx * 0.42;
+    const x = padX(g, l, 1), y = g.yStrike;
+    const w = laneW * FRET, rx = w / 2, ry = rx * 0.42;
     const L = LANES[l];
     const press = G.pressed[l] && now - G.pressed[l] < 110;
     const dy = press ? 3 * DPR : 0;
@@ -1049,7 +1126,7 @@
       const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.6;
       const sp = (0.25 + Math.random() * 0.6);
       G.particles.push({
-        lane, t: now, life: 260 + Math.random() * 260,
+        lane, fx: lane === 0 ? Math.random() : (COL[lane] + 0.5) / NC, t: now, life: 260 + Math.random() * 260,
         vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * 1.4,
         c: G.spActive ? (Math.random() < 0.5 ? "#bff6ff" : "#59e6ff") : Math.random() < 0.5 ? "#ffd24a" : "#ff7a12",
         r: 1.5 + Math.random() * 2.5,
@@ -1062,11 +1139,25 @@
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
     // Flames: short upward fire from the fret
-    for (let l = 0; l < NL; l++) {
+    // Kick: a flash along the whole strike line
+    {
+      const age = now - G.flames[0];
+      if (age <= 240) {
+        const k = age / 240;
+        const fh = laneW * 0.5 * (1 - k * 0.5);
+        const grd = ctx.createLinearGradient(0, g.yStrike - fh, 0, g.yStrike + 6 * DPR);
+        grd.addColorStop(0, "rgba(0,0,0,0)");
+        grd.addColorStop(1, G.spActive ? "#9ff2ff" : "#ff9a2a");
+        ctx.globalAlpha = (1 - k) * 0.8;
+        ctx.fillStyle = grd;
+        ctx.fillRect(xAt(g, 0, 1), g.yStrike - fh, g.wNear, fh + 6 * DPR);
+      }
+    }
+    for (let l = 1; l < NL; l++) {
       const age = now - G.flames[l];
       if (age > 240) continue;
       const k = age / 240;
-      const x = xAt(g, l + 0.5, 1), y = g.yStrike;
+      const x = padX(g, l, 1), y = g.yStrike;
       const h = laneW * (1.6 - k * 0.4), w = laneW * 0.55 * (1 - k * 0.5);
       for (let j = 0; j < 3; j++) {
         const grd = ctx.createRadialGradient(x, y - h * 0.2, 0, x, y - h * 0.35, h * 0.7);
@@ -1093,7 +1184,7 @@
       if (age > p.life) continue;
       keep.push(p);
       const k = age / p.life;
-      const x = xAt(g, p.lane + 0.5, 1) + p.vx * age * DPR * 0.6;
+      const x = xAt(g, p.fx * NC, 1) + p.vx * age * DPR * 0.6;
       const y = g.yStrike + p.vy * age * DPR * 0.6 + 0.0009 * age * age * DPR;
       ctx.globalAlpha = 1 - k;
       ctx.fillStyle = p.c;
